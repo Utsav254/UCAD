@@ -1,24 +1,29 @@
-#include "UCADWin.h"
+#include "win.h"
 #include "winClass.hpp"
 
-int WINAPI WinMain (
+int WINAPI WinMain(
     _In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
     _In_ LPSTR lpCmdLine,
     _In_ int nShowCmd
-) 
-{
-    LPCWSTR windowName = L"Main Window";
-    window wnd(640 , 480 , windowName);
+) {
+    try {
+        mainWindow wnd(640, 480, L"Main Window");
+       
+        MSG windowMessage;
+        BOOL windowMessageResult;
+        while ((windowMessageResult = GetMessageW(&windowMessage, nullptr, 0, 0)) > 0) {
+            TranslateMessage(&windowMessage);
+            DispatchMessageW(&windowMessage);
+        }
 
-    MSG windowMessage;
-    BOOL windowMessageResult;
-    while ((windowMessageResult = GetMessage(&windowMessage, nullptr, 0, 0)) > 0) {
-        TranslateMessage(&windowMessage);
-        DispatchMessageW(&windowMessage);
+        if (windowMessageResult == -1) return -1;
+        else return (int)windowMessage.wParam;
     }
-
-    if (windowMessageResult == -1) return -1;
-    else return (int)windowMessage.wParam;
+    catch (const error& e) {
+        e.display();
+        return EXIT_FAILURE;
+    }
 }
+
 

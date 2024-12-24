@@ -1,44 +1,73 @@
 #pragma once
-#include <UCADWin.h>
+#include "windowBaseClass.hpp"
 
-// Encapsulating class for window creation and destruction ...
-// Easily create windows by instantiating a this class ... clean up is automatically handled
-// To handle multiple instances the message pump will need modification maybe multi threading the windows?
-// To modify the behaviour overriding the member functions should work because of the message redirection system
-
-class window {
+class mainWindow : public window<mainWindow>
+{
 public:
-	window(const int width , const int height , LPCWSTR windowName) noexcept;
-	~window();
-	
+    static constexpr LPCWSTR className = L"MainWindow";
+
+	mainWindow(const int width, const int height, LPCWSTR windowName):
+		_height(height), _width(width), _windowName(windowName),
+        _hWnd(
+            CreateWindowExW(
+                0,
+                className, nullptr,
+                WS_SYSMENU,
+                CW_USEDEFAULT, CW_USEDEFAULT,
+                width, height,
+                nullptr, nullptr,
+                getInstance(), nullptr)
+            )
+	{
+        ShowWindow(_hWnd, SW_SHOWNORMAL);
+    }
+
+	~mainWindow() noexcept = default;
+
+	static WNDCLASSEXW* defineWindowClass() noexcept
+    {
+        static WNDCLASSEX wc = { 0 };
+        wc.cbSize = sizeof(wc);
+        wc.style = CS_OWNDC | CS_DBLCLKS;
+        wc.lpfnWndProc = DefWindowProcW;
+        wc.cbClsExtra = 0;
+        wc.cbWndExtra = 0;
+        wc.hInstance = getInstance();
+        wc.hIcon = nullptr;
+        wc.hCursor = nullptr;
+        wc.hbrBackground = nullptr;
+        wc.lpszMenuName = nullptr;
+        wc.lpszClassName = className;
+        wc.hIcon = nullptr;
+        return &wc;
+    }
+
+    LRESULT handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+    {
+        switch (msg)
+        {
+        case WM_CLOSE:
+            if (this->_instanceCount.load() == 1) PostQuitMessage(0);
+            else DestroyWindow(hWnd);
+            return 0;
+        case WM_DESTROY:
+            std::destroy_at(this);
+            return 0;
+        default:
+            return DefWindowProcW(hWnd, msg, wParam, lParam);
+        }
+    }
+
+    static inline const HINSTANCE getInstance()
+    {
+        static const HINSTANCE hInst = GetModuleHandleW(nullptr);
+        return hInst;
+    }
+
+    inline const HWND getHandle() const { return _hWnd; }
+
 private:
-	//handling WndProc using static member function and a member function
-	static LRESULT CALLBACK handleMessageSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	static inline LRESULT CALLBACK handleMessageRedirect(HWND hWnd , UINT msg , WPARAM wParam , LPARAM lParam) noexcept;
-	//WndProc or message handled for this window class
-	LRESULT CALLBACK handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-
-	//member variables
-	int _width, _height;
-	HWND _hWnd;
-
-//----------------singleton windowClass automatic register and unregister--------------------------
-
-private:
-	class windowClass {
-	public:
-		static inline const LPCWSTR getName() noexcept;
-		static inline const HINSTANCE getInstance() noexcept;
-	private:
-		windowClass() noexcept;
-		~windowClass();
-		//explicir delete on copies for this singleton 
-		windowClass(const windowClass&) = delete;
-		windowClass& operator= (const windowClass&) = delete;
-
-		//member variables
-		static constexpr const LPCWSTR _windowClassName = L"MainWindowClass";
-		static windowClass _windowClass;
-		HINSTANCE _hInst;
-	};
+	int _height, _width;
+	LPCWSTR _windowName;
+    const HWND _hWnd;
 };

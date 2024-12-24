@@ -21,10 +21,7 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\windowsMessageLog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\winClass.cpp">
+    <ClCompile Include="src\util\error.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -40,10 +37,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\UCADWin.h">
+    <ClInclude Include="include\win.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\windowsMessageLog.hpp">
+    <ClInclude Include="include\windowBaseClass.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\util\error.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\winClass.hpp">
