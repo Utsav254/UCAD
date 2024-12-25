@@ -12,11 +12,11 @@ public:
             CreateWindowExW(
                 0,
                 className, nullptr,
-                WS_SYSMENU,
+                WS_POPUP | WS_BORDER,
                 CW_USEDEFAULT, CW_USEDEFAULT,
                 width, height,
                 nullptr, nullptr,
-                getInstance(), nullptr)
+                getInstance(), this)
             )
 	{
         ShowWindow(_hWnd, SW_SHOWNORMAL);
@@ -47,12 +47,20 @@ public:
         switch (msg)
         {
         case WM_CLOSE:
-            if (this->_instanceCount.load() == 1) PostQuitMessage(0);
-            else DestroyWindow(hWnd);
+            DestroyWindow(hWnd);
             return 0;
         case WM_DESTROY:
-            std::destroy_at(this);
+            if (this->_instanceCount.load() == 1) PostQuitMessage(0);
+            this->_instanceCount--;
             return 0;
+        case WM_NCHITTEST:
+        {
+            POINT pt = { LOWORD(lParam),HIWORD(lParam) };
+            ScreenToClient(hWnd, &pt);
+
+            if (pt.y < (int)(0.05 * _height)) return HTCAPTION;
+            else return HTCLIENT;
+        }
         default:
             return DefWindowProcW(hWnd, msg, wParam, lParam);
         }
