@@ -22,7 +22,6 @@
 #define NOMEMMGR
 #define NOMETAFILE
 #define NOOPENFILE
-#define NOSCROLL
 #define NOSERVICE
 #define NOSOUND
 #define NOTEXTMETRIC

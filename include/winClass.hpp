@@ -1,47 +1,29 @@
 #pragma once
 #include "windowBaseClass.hpp"
 
-class mainWindow : public window {
+class mainWindow : public window<mainWindow>
+{
 public:
-	static constexpr LPCWSTR className = L"MainWindow";
 
-	mainWindow(const int width, const int height, LPCWSTR windowName, HINSTANCE hInst) :
-		window(className, &wc),
-		_height(height), _width(width), _windowName(windowName),
+    mainWindow(const int width, const int height, LPCWSTR windowName, HINSTANCE hInst) :
+        window(&wc, hInst),
+        _height(height), _width(width), _windowName(windowName),
         _hWnd(
             CreateWindowExW(
-                0,
-                className, nullptr,
-                WS_POPUP | WS_BORDER,
+                WS_EX_APPWINDOW,
+                getClassName(), nullptr,
+                WS_OVERLAPPEDWINDOW & ~(WS_SYSMENU | WS_CAPTION | WS_MINIMIZEBOX),
                 CW_USEDEFAULT, CW_USEDEFAULT,
                 width, height,
                 nullptr, nullptr,
                 getInstance(), this)
-            )
-	{
-		if (!_hWnd) throw WINDOW_ERROR;
-		ShowWindow(_hWnd, SW_SHOWNORMAL);
-	}
-
-	~mainWindow() noexcept = default;
-
-	static WNDCLASSEXW* defineWindowClass() noexcept
+        )
     {
-        static WNDCLASSEX wc = { 0 };
-        wc.cbSize = sizeof(wc);
-        wc.style = CS_OWNDC | CS_DBLCLKS;
-        wc.lpfnWndProc = DefWindowProcW;
-        wc.cbClsExtra = 0;
-        wc.cbWndExtra = 0;
-        wc.hInstance = getInstance();
-        wc.hIcon = nullptr;
-        wc.hCursor = nullptr;
-        wc.hbrBackground = nullptr;
-        wc.lpszMenuName = nullptr;
-        wc.lpszClassName = className;
-        wc.hIcon = nullptr;
-        return &wc;
+        if (!_hWnd) throw WINDOW_ERROR;
+        ShowWindow(_hWnd, SW_SHOWNORMAL);
     }
+
+    ~mainWindow() noexcept = default;
 
     LRESULT handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
@@ -54,47 +36,48 @@ public:
             if (this->_instanceCount.load() == 1) PostQuitMessage(0);
             this->_instanceCount--;
             return 0;
-        case WM_NCHITTEST:
+        case WM_PAINT:
         {
-            POINT pt = { LOWORD(lParam),HIWORD(lParam) };
-            ScreenToClient(hWnd, &pt);
-
-            if (pt.y < (int)(0.05 * _height)) return HTCAPTION;
-            else return HTCLIENT;
+            PAINTSTRUCT ps;
+            HDC hdc = BeginPaint(hWnd, &ps);
+            HBRUSH hBrush = CreateSolidBrush(RGB(0, 0, 0));
+            RECT rect;
+            GetClientRect(hWnd, &rect);
+            FillRect(hdc, &rect, hBrush);
+            DeleteObject(hBrush);
+            EndPaint(hWnd, &ps);
+            return 0;
         }
         default:
             return DefWindowProcW(hWnd, msg, wParam, lParam);
         }
     }
 
-    static inline const HINSTANCE getInstance()
-    {
-        static const HINSTANCE hInst = GetModuleHandleW(nullptr);
-        return hInst;
-    }
+    static inline constexpr LPCWSTR getClassName() { return L"MainWindowClass"; }
 
-	inline const HINSTANCE getInstance() const override { return _hInst; }
-	inline const HWND getHandle() const { return _hWnd; }
+    inline const HINSTANCE getInstance() const { return _hInst; }
+
+    inline const HWND getHandle() const { return _hWnd; }
 
 private:
-	int _height, _width;
-	LPCWSTR _windowName;
-	const HINSTANCE _hInst;
-	const HWND _hWnd;
+    int _height, _width;
+    LPCWSTR _windowName;
+    const HWND _hWnd;
 
-	static inline WNDCLASSEXW wc =
-	{
-		.cbSize = sizeof(WNDCLASSEXW),
-		.style = CS_OWNDC | CS_DBLCLKS,
-		.lpfnWndProc = DefWindowProcW,
-		.cbClsExtra = 0,
-		.cbWndExtra = 0,
-		.hInstance = nullptr,
-		.hIcon = nullptr,
-		.hCursor = nullptr,
-		.hbrBackground = nullptr,
-		.lpszMenuName = nullptr,
-		.lpszClassName = nullptr,
-		.hIconSm = nullptr
-	};
+private:
+    static inline WNDCLASSEX wc =
+    {
+        .cbSize = sizeof(WNDCLASSEXW),
+        .style = CS_OWNDC | CS_DBLCLKS,
+        .lpfnWndProc = DefWindowProcW,
+        .cbClsExtra = 0,
+        .cbWndExtra = 0,
+        .hInstance = nullptr,
+        .hIcon = nullptr,
+        .hCursor = nullptr,
+        .hbrBackground = nullptr,
+        .lpszMenuName = nullptr,
+        .lpszClassName = getClassName(),
+        .hIconSm = nullptr,
+    };
 };

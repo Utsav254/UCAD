@@ -1,5 +1,6 @@
 #pragma once
 #include <win.h>
+#include <type_traits>
 #include <atomic>
 #include "util/error.hpp"
 
@@ -27,43 +28,60 @@ private:
 	HRESULT _hr;
 };
 
+template <typename T>
+concept hasHandleMessage = requires(T & obj, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+	{ (obj.handleMessage(hWnd, msg, wParam, lParam)) } -> std::same_as<LRESULT>;
+};
+
+template<typename T>
+concept hasGetClassName = requires() {
+	{ (T::getClassName()) } -> std::convertible_to<LPCWSTR>;
+};
+
+template<typename Derived>
 class window {
-public:
+private:
 
-	virtual inline const HINSTANCE getInstance() const { return GetModuleHandleW(nullptr); }
-	virtual LRESULT handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) = 0;
+	static_assert(std::is_class_v<Derived>, "Derived must be a class type");
 
-	window(LPCWSTR className, WNDCLASSEXW* wc) : _className(className)
+protected:
+
+	static inline std::atomic<int> _instanceCount{ 0 };
+	static inline bool _isRegistered = false;
+	HINSTANCE _hInst;
+
+	window(WNDCLASSEXW* wc, HINSTANCE hInst) : _hInst(hInst)
 	{
+		static_assert(hasHandleMessage<Derived>,
+			"Derived must implement the LRESULT handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) method");
+
+		static_assert(hasGetClassName<Derived>,
+			"Derived must implement the (optional,reccomended: inline constexpr) static LPCWSTR getClassName() method");
+
 		if (!_isRegistered) {
 			wc->lpfnWndProc = handleMessageSetup;
-			wc->lpszClassName = className;
-			wc->hInstance = getInstance();
+			wc->lpszClassName = Derived::getClassName();
+			wc->hInstance = _hInst;
 			if (RegisterClassExW(wc) == 0) throw WINDOW_ERROR;
 			_isRegistered = true;
 		}
 		_instanceCount++;
 	}
 
-	virtual ~window() noexcept
+	~window() noexcept
 	{
 		_instanceCount--;
-		if (_instanceCount.load() <= 0) {
-			UnregisterClassW(_className, getInstance());
+		if (_instanceCount.load() == 0) {
+			UnregisterClassW(Derived::getClassName(), _hInst);
 		}
 	}
-
-protected:
-	static inline std::atomic<int> _instanceCount{ 0 };
-	static inline bool _isRegistered = false;
-	const LPCWSTR _className;
 
 private:
 	static LRESULT CALLBACK handleMessageSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 	{
 		if (msg == WM_NCCREATE) {
 			const CREATESTRUCTW* const tempCreateStruct = reinterpret_cast<CREATESTRUCTW*>(lParam);
-			window* const tempWindow = static_cast<window*>(tempCreateStruct->lpCreateParams);
+			Derived* const tempWindow = static_cast<Derived*>(tempCreateStruct->lpCreateParams);
 
 			SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(tempWindow));
 			SetWindowLongPtrW(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&window::handleMessageRedirect));
@@ -73,7 +91,7 @@ private:
 	}
 
 	static inline LRESULT CALLBACK handleMessageRedirect(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept {
-		window* const tempWindow = reinterpret_cast<window*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+		Derived* const tempWindow = reinterpret_cast<Derived*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 		return tempWindow->handleMessage(hWnd, msg, wParam, lParam);
 	}
 };

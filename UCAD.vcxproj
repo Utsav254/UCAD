@@ -136,8 +136,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\util\error.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\util\error.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitattributes" />
