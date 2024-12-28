@@ -116,7 +116,7 @@
     <Link>
       <SubSystem>NotSet</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;dwmapi.lib;Uxtheme.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -138,6 +138,9 @@
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\util\error.cpp" />
+    <ClCompile Include="src\win32\bases\button.cpp" />
+    <ClCompile Include="src\win32\bases\window.cpp" />
+    <ClCompile Include="src\win32\mainWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitattributes" />
@@ -146,9 +149,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\util\error.hpp" />
-    <ClInclude Include="include\win.h" />
-    <ClInclude Include="include\winClass.hpp" />
-    <ClInclude Include="include\windowBaseClass.hpp" />
+    <ClInclude Include="include\win32\bases\button.hpp" />
+    <ClInclude Include="include\win32\bases\window.hpp" />
+    <ClInclude Include="include\win32\SimpleButton.hpp" />
+    <ClInclude Include="include\win32\mainWindow.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
