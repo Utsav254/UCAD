@@ -1,5 +1,6 @@
-﻿#include "win.h"
-#include "winClass.hpp"
+﻿#include <windows.h>
+#include "win32/mainWindow.hpp"
+#include "util/error.hpp"
 
 int WINAPI WinMain(
     _In_ HINSTANCE hInstance,
@@ -8,7 +9,13 @@ int WINAPI WinMain(
     _In_ int nShowCmd
 ) {
     try {
-        mainWindow wnd(640, 480, L"Main Window", hInstance);
+
+        if (!SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2))
+            throw ERROR_FMT_M("Unable to set high dpi awareness");
+
+        mainWindow wnd(1920, 1080, L"Main Window", hInstance);
+        wnd.createWindow(true, nullptr);
+
 
         MSG windowMessage;
         BOOL windowMessageResult;
