@@ -9,7 +9,6 @@ int WINAPI WinMain(
     _In_ int nShowCmd
 ) {
     try {
-
         if (!SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2))
             throw ERROR_FMT_M("Unable to set high dpi awareness");
 
