@@ -2,7 +2,7 @@
 
 mainWindow::mainWindow(const int width, const int height, LPCWSTR windowName, HINSTANCE hInst) :
     window(&wc, hInst, L"MainWindowClass"),
-    bt(hInst, 200, 200, 50, 50, 1001),
+    tb(hInst, 0, 0, width, 200),
     _height(height), _width(width),
     _windowName(windowName),
     _hWnd(nullptr)
@@ -39,7 +39,12 @@ LRESULT mainWindow::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
     {
         case WM_CREATE:
         {
-            bt.createWindow(true, hWnd);
+            tb.createWindow(true, hWnd);
+            break;
+        }
+        case WM_SIZE:
+        {
+            tb.postMessage(WM_SIZE, wParam, lParam);
             break;
         }
         case WM_CLOSE:
@@ -52,7 +57,7 @@ LRESULT mainWindow::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
             int i = getInstanceCount();
             if (i == -1) throw ERROR_FMT_M("Internal windowing frame work error ... WNDCLASSEX name not found in _registry of WNDLCASSEX manager");
             if (i == 1) PostQuitMessage(0);
-            this->cleanUp();
+            this->destroyWindow();
             return 0;
         }
     }

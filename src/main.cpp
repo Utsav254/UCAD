@@ -23,6 +23,7 @@ int WINAPI WinMain(
             DispatchMessageW(&windowMessage);
         }
 
+        window::UnregisterAll();
         if (windowMessageResult == -1) return -1;
         else return (int)windowMessage.wParam;
     }

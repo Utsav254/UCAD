@@ -1,32 +1,29 @@
 #pragma once
-#include "win32/bases/window.hpp"
-#include "SimpleButton.hpp"
+#include "win32/window.hpp"
+#include "win32/toolbar.hpp"
 
 class mainWindow : public window {
 public:
-
     mainWindow(const int width, const int height, LPCWSTR windowName, HINSTANCE hInst);
 
-    ~mainWindow() noexcept = default;
+    ~mainWindow() = default;
 
     void createWindow(const bool showWindow, HWND parent) override;
 
     LRESULT handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
 public:
-
     inline const HWND getWindowHandle() const { return _hWnd; }
 
 private:
 
-    buttonSimple bt;
+    toolBar tb;
 
     int _height, _width;
     LPCWSTR _windowName;
     HWND _hWnd;
 
 private:
-
     static inline WNDCLASSEX wc =
     {
         .cbSize = sizeof(WNDCLASSEXW),
@@ -37,7 +34,7 @@ private:
         .hInstance = nullptr,
         .hIcon = nullptr,
         .hCursor = LoadCursorW(nullptr, IDC_ARROW),
-        .hbrBackground = (HBRUSH)GetStockObject(GRAY_BRUSH),
+        .hbrBackground = nullptr,
         .lpszMenuName = nullptr,
         .lpszClassName = nullptr,
         .hIconSm = nullptr,

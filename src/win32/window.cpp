@@ -1,4 +1,4 @@
-#include "win32/bases/window.hpp"
+#include "win32/window.hpp"
 
 windowError::windowError(const int line, LPCWSTR fileName, LPCWSTR message, HRESULT hr) :
 	error(line, fileName, message), _hr(hr)
@@ -45,15 +45,19 @@ window::~window() noexcept
 	auto it = _registry.find(classNameWString);
 
 	if (it != _registry.end()) {
-		it->second--;
-		if (it->second < 0) {
-			UnregisterClassW(_className, _hInst);
-			_registry.erase(it);
-		}
+		if(it->second > 0) it->second--;
 	}
 }
 
-void window::cleanUp() noexcept
+void window::UnregisterAll() noexcept
+{
+	std::lock_guard<std::mutex> lock(_mtx);
+	for (std::unordered_map<std::wstring, int>::value_type& element : _registry) {	
+		UnregisterClassW(element.first.c_str(), GetModuleHandleW(nullptr));
+	}
+}
+
+void window::destroyWindow() noexcept
 {
 	std::lock_guard<std::mutex> lock(_mtx);
 
@@ -61,9 +65,12 @@ void window::cleanUp() noexcept
 	auto it = _registry.find(classNameWString);
 
 	if (it != _registry.end()) {
-		it->second--;
+		if(it->second >0) it->second--;
 	}
+
+#ifdef _DEBUG
 	else __debugbreak();
+#endif // _DEBUG
 }
 
 const int window::getInstanceCount() const noexcept

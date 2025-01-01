@@ -1,5 +1,5 @@
 #pragma once
-#include <windows.h>
+#include "win32/win.h"
 #include <mutex>
 #include <unordered_map>
 #include <string>
@@ -23,7 +23,9 @@ public:
 
 	virtual ~window() noexcept;
 
-	virtual void cleanUp() noexcept final;
+	static void UnregisterAll() noexcept;
+
+	virtual void destroyWindow() noexcept final;
 
 	virtual LRESULT handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) = 0;
 

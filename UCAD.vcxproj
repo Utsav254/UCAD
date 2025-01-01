@@ -137,10 +137,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\win32\toolbar.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\util\error.cpp" />
-    <ClCompile Include="src\win32\bases\button.cpp" />
-    <ClCompile Include="src\win32\bases\window.cpp" />
+    <ClCompile Include="src\win32\window.cpp" />
     <ClCompile Include="src\win32\mainWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -150,10 +150,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\util\error.hpp" />
-    <ClInclude Include="include\win32\bases\button.hpp" />
-    <ClInclude Include="include\win32\bases\window.hpp" />
-    <ClInclude Include="include\win32\SimpleButton.hpp" />
+    <ClInclude Include="include\win32\win.h" />
+    <ClInclude Include="include\win32\window.hpp" />
     <ClInclude Include="include\win32\mainWindow.hpp" />
+    <ClInclude Include="include\win32\toolbar.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

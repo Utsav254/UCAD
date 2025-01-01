@@ -27,10 +27,10 @@
     <ClCompile Include="src\win32\mainWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\win32\bases\window.cpp">
+    <ClCompile Include="src\win32\window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\win32\bases\button.cpp">
+    <ClCompile Include="src\win32\toolbar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -52,13 +52,13 @@
     <ClInclude Include="include\win32\mainWindow.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\win32\bases\button.hpp">
+    <ClInclude Include="include\win32\window.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\win32\SimpleButton.hpp">
+    <ClInclude Include="include\win32\toolbar.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\win32\bases\window.hpp">
+    <ClInclude Include="include\win32\win.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
