@@ -9,7 +9,7 @@ toolBar::toolBar(HINSTANCE hInst, int x, int y, int width, int height) :
 	_dirty(true)
 {}
 
-void toolBar::createWindow(const bool showWindow, HWND parent, ID3D11Device* device, ID3D11DeviceContext* context)
+void toolBar::createWindow(const bool showWindow, HWND parent, ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context)
 {
 	if (parent == nullptr) throw ERROR_FMT_M("toolbar was given nullptr parent handle");
 	_hWndParent = parent;
@@ -55,7 +55,7 @@ void toolBar::createWindow(const bool showWindow, HWND parent, ID3D11Device* dev
 		throw WINDOW_ERROR_HR(res);
 	}
 
-	res = factory->CreateSwapChain(_device, &sd, &_swap);
+	res = factory->CreateSwapChain(_device.Get(), &sd, &_swap);
 	if (FAILED(res)) throw WINDOW_ERROR_HR(res);
 
 	ID3D11Texture2D* pBackBuffer;
@@ -94,7 +94,7 @@ LRESULT toolBar::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 
 				ID3D11Texture2D* pBackBuffer;
 				_swap->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
-				if(pBackBuffer != nullptr) _device->CreateRenderTargetView(pBackBuffer, nullptr, &_renderTargetView);
+				if(pBackBuffer != nullptr) _device->CreateRenderTargetView(pBackBuffer, nullptr, _renderTargetView.GetAddressOf());
 				pBackBuffer->Release();
 			}
 

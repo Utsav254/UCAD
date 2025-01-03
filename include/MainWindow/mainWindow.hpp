@@ -1,9 +1,9 @@
 #pragma once
 #include "util/window.hpp"
 #include "Ribbon/toolbar.hpp"
-#include <wrl/client.h>
 #include <d3d11.h>
 
+#include <wrl/client.h>
 using Microsoft::WRL::ComPtr;
 
 class mainWindow : public window {
@@ -12,10 +12,7 @@ public:
 
     mainWindow(const int width, const int height, LPCWSTR windowName, HINSTANCE hInst);
 
-    ~mainWindow() {
-        if (_context != nullptr) _context->Release();
-        if (_device != nullptr) _device->Release();
-    }
+    ~mainWindow() = default;
 
     void createWindow(const bool showWindow);
 
@@ -35,8 +32,8 @@ private:
     LPCWSTR _windowName;
     HWND _hWnd;
 
-    ID3D11Device* _device;
-    ID3D11DeviceContext* _context;
+    ComPtr<ID3D11Device> _device;
+    ComPtr<ID3D11DeviceContext> _context;
 
 private:
     static inline WNDCLASSEX wc =

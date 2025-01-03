@@ -16,10 +16,10 @@ ui::~ui()
 	ImGui::DestroyContext(_uiContext);
 }
 
-void ui::initialise(HWND hWnd, ID3D11Device* device, ID3D11DeviceContext* context)
+void ui::initialise(HWND hWnd, ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context)
 {
 	ImGui_ImplWin32_Init(hWnd);
-	ImGui_ImplDX11_Init(device, context);
+	ImGui_ImplDX11_Init(device.Get(), context.Get());
 }
 
 void ui::newFrame()
@@ -30,10 +30,10 @@ void ui::newFrame()
 	ImGui::NewFrame();
 }
 
-void ui::endFrame(ID3D11DeviceContext* context, ID3D11RenderTargetView* renderTargetView, const float color[4])
+void ui::endFrame(ComPtr<ID3D11DeviceContext> context, ComPtr<ID3D11RenderTargetView> renderTargetView, const float color[4])
 {
 	ImGui::Render();
-	context->OMSetRenderTargets(1, &renderTargetView, nullptr);
-	context->ClearRenderTargetView(renderTargetView, color);
+	context->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), nullptr);
+	context->ClearRenderTargetView(renderTargetView.Get(), color);
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }

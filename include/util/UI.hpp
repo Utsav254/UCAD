@@ -5,6 +5,9 @@
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 
+#include <wrl/client.h>
+using Microsoft::WRL::ComPtr;
+
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 class ui
@@ -19,9 +22,9 @@ public:
 	ui();
 	~ui();
 
-	void initialise(HWND hWnd, ID3D11Device* device, ID3D11DeviceContext* context);
+	void initialise(HWND hWnd, ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context);
 
 	void newFrame();
 
-	void endFrame(ID3D11DeviceContext* context, ID3D11RenderTargetView* renderTargetView, const float color[4]);
+	void endFrame(ComPtr<ID3D11DeviceContext> context, ComPtr<ID3D11RenderTargetView> renderTargetView, const float color[4]);
 };

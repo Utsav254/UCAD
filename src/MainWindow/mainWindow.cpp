@@ -10,8 +10,7 @@ mainWindow::mainWindow(const int width, const int height, LPCWSTR windowName, HI
     _windowName(windowName),
     _hWnd(nullptr),
     _device(nullptr), _context(nullptr)
-{
-}
+{}
 
 void mainWindow::createWindow(const bool showWindow)
 {
@@ -60,7 +59,7 @@ void mainWindow::createWindow(const bool showWindow)
     }
     if (res != S_OK) throw WINDOW_ERROR_HR(res);
 
-    tb.createWindow(true, _hWnd, _device, _context);
+    tb.createWindow(true, _hWnd, _device.Get(), _context.Get());
     if (showWindow) ShowWindow(_hWnd, SW_SHOWNORMAL);
 }
 
