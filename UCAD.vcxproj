@@ -109,7 +109,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\U15go\Documents\dev\UCAD\deps\ImGui;$(SolutionDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -117,7 +117,7 @@
     <Link>
       <SubSystem>NotSet</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;dwmapi.lib;Uxtheme.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;DXGI.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -137,11 +137,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\win32\toolbar.cpp" />
+    <ClCompile Include="deps\ImGui\imgui.cpp" />
+    <ClCompile Include="deps\ImGui\imgui_demo.cpp" />
+    <ClCompile Include="deps\ImGui\imgui_draw.cpp" />
+    <ClCompile Include="deps\ImGui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="deps\ImGui\imgui_impl_win32.cpp" />
+    <ClCompile Include="deps\ImGui\imgui_tables.cpp" />
+    <ClCompile Include="deps\ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="src\MainWindow\mainWindow.cpp" />
+    <ClCompile Include="src\Ribbon\toolbar.cpp" />
+    <ClCompile Include="src\util\UI.cpp" />
+    <ClCompile Include="src\util\window.cpp" />
+    <ClCompile Include="src\util\windowError.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\util\error.cpp" />
-    <ClCompile Include="src\win32\window.cpp" />
-    <ClCompile Include="src\win32\mainWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitattributes" />
@@ -149,11 +158,21 @@
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="deps\ImGui\imconfig.h" />
+    <ClInclude Include="deps\ImGui\imgui.h" />
+    <ClInclude Include="deps\ImGui\imgui_impl_dx11.h" />
+    <ClInclude Include="deps\ImGui\imgui_impl_win32.h" />
+    <ClInclude Include="deps\ImGui\imgui_internal.h" />
+    <ClInclude Include="deps\ImGui\imstb_rectpack.h" />
+    <ClInclude Include="deps\ImGui\imstb_textedit.h" />
+    <ClInclude Include="deps\ImGui\imstb_truetype.h" />
+    <ClInclude Include="include\MainWindow\mainWindow.hpp" />
+    <ClInclude Include="include\Ribbon\toolbar.hpp" />
     <ClInclude Include="include\util\error.hpp" />
-    <ClInclude Include="include\win32\win.h" />
-    <ClInclude Include="include\win32\window.hpp" />
-    <ClInclude Include="include\win32\mainWindow.hpp" />
-    <ClInclude Include="include\win32\toolbar.hpp" />
+    <ClInclude Include="include\util\UI.hpp" />
+    <ClInclude Include="include\util\win.h" />
+    <ClInclude Include="include\util\window.hpp" />
+    <ClInclude Include="include\util\windowError.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

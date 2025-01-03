@@ -1,6 +1,6 @@
 #pragma once
+#include "util/win.h"
 #include <string>
-#include <windows.h>
 
 class error
 {

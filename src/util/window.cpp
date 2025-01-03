@@ -1,30 +1,19 @@
-#include "win32/window.hpp"
+#include "util/window.hpp"
 
-windowError::windowError(const int line, LPCWSTR fileName, LPCWSTR message, HRESULT hr) :
-	error(line, fileName, message), _hr(hr)
-{
-	LPWSTR errorMsg = nullptr;
-	FormatMessageW(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-		nullptr, hr,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),
-		(LPWSTR)&errorMsg, 0, nullptr
-	);
-	_whatBuffer += errorMsg ? std::wstring(errorMsg) : L"Unknown error";
-	if (errorMsg) LocalFree(errorMsg);
-}
-
-window::window(WNDCLASSEXW* wc, HINSTANCE hInst, LPCWSTR className)
-	: _hInst(hInst), _className(className)
+window::window(WNDCLASSEXW* wc)
 {
 	std::lock_guard<std::mutex> lock(_mtx);
 
-	std::wstring classNameWString(className);
+#ifdef _DEBUG
+	if (_hInst == nullptr) __debugbreak();
+#endif //_DEBUG
+
+	_className = wc->lpszClassName;
+	std::wstring classNameWString(wc->lpszClassName);
 	auto it = _registry.find(classNameWString);
 
 	if (it == _registry.end()) {
 		wc->lpfnWndProc = handleMessageSetup;
-		wc->lpszClassName = _className;
 		wc->hInstance = _hInst;
 
 		if (RegisterClassExW(wc) == 0)
@@ -49,7 +38,13 @@ window::~window() noexcept
 	}
 }
 
-void window::UnregisterAll() noexcept
+void window::startUp(HINSTANCE hInst) noexcept
+{
+	std::lock_guard<std::mutex> lock(_mtx);
+	_hInst = hInst;
+}
+
+void window::shutDown() noexcept
 {
 	std::lock_guard<std::mutex> lock(_mtx);
 	for (std::unordered_map<std::wstring, int>::value_type& element : _registry) {	
