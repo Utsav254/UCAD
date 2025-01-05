@@ -33,9 +33,14 @@ private:
 	ComPtr<IDXGISwapChain> _swap;
 	ComPtr<ID3D11RenderTargetView>_renderTargetView;
 
+	dx::XMVECTOR _cameraPos;
+
 	dx::XMMATRIX _model;
 	dx::XMMATRIX _view;
 	dx::XMMATRIX _projection;
+
+	bool _isDragging;
+	POINT _lastPoint;
 
 private:
 	static inline WNDCLASSEX wc =

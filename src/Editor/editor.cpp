@@ -7,18 +7,20 @@ editor::editor(int x, int y, int width, int height) :
 	_width(width), _height(height),
 	_hWnd(nullptr), _hWndParent(nullptr),
 	_device(nullptr), _context(nullptr), _swap(nullptr), _renderTargetView(nullptr),
-	_model(dx::XMMatrixIdentity()), 
+	_cameraPos(dx::XMVectorSet(2.0f, 2.0f, 2.0f, 1.0f)),
+	_model(dx::XMMatrixIdentity()),
 	_view(dx::XMMatrixLookAtLH(
-		dx::XMVectorSet(2.0f, 2.0f, 2.0f, 1.0f),
+		_cameraPos,
 		dx::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f),
 		dx::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)
 	)),
 	_projection(dx::XMMatrixPerspectiveFovLH(
-		dx::XM_PIDIV4, 
+		dx::XM_PIDIV4,
 		static_cast<float>(_width / _height),
 		0.1f,
 		100.0f
-	))
+	)),
+	_isDragging(false), _lastPoint({ 0, 0 })
 {}
 
 void editor::createWindow(const bool showWindow, HWND parent, ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context)
@@ -90,6 +92,8 @@ LRESULT editor::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			_width = (UINT)LOWORD(lParam);
 			_height = (UINT)HIWORD(lParam);
 
+			if (_width == 0 || _height == 0) return 0;
+
 			if (_device && _swap && _renderTargetView) {
 				_renderTargetView->Release();
 
@@ -105,14 +109,114 @@ LRESULT editor::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			_projection = dx::XMMatrixPerspectiveFovLH(
 				dx::XM_PIDIV4,
-				static_cast<float>(_width / _height),
+				static_cast<float>(_width) / static_cast<float>(_height),
 				0.1f,
 				100.0f
 			);
+
+			D3D11_VIEWPORT viewPort
+			{
+				.TopLeftX = 0,
+				.TopLeftY = 0,
+				.Width = static_cast<float>(_width),
+				.Height = static_cast<float>(_height),
+				.MinDepth = 0,
+				.MaxDepth = 1
+			};
+			_context->RSSetViewports(1, &viewPort);
+
 			return 0;
 		}
 		case WM_USER + 1:
 		{
+			return 0;
+		}
+		case WM_LBUTTONDOWN:
+		{
+			SetCapture(hWnd);
+			_isDragging = true;
+			_lastPoint.x = LOWORD(lParam);
+			_lastPoint.y = HIWORD(lParam);
+			return 0;
+		}
+		case WM_MOUSEMOVE:
+		{
+			if (_isDragging) {
+				POINT currPoint = { LOWORD(lParam), HIWORD(lParam) };
+
+				float dx = DirectX::XMConvertToRadians(0.25f * (currPoint.x - _lastPoint.x));
+				float dy = DirectX::XMConvertToRadians(0.25f * (currPoint.y - _lastPoint.y));
+
+				// Assuming _cameraPos.x = azimuth, _cameraPos.y = pitch, _cameraPos.z = radius
+				DirectX::XMFLOAT3 spherical;
+				DirectX::XMStoreFloat3(&spherical, _cameraPos);
+
+				spherical.x -= dx;  // Adjust azimuth (horizontal rotation)
+				spherical.y = std::max(-DirectX::XM_PIDIV2 + 0.01f,
+					std::min(spherical.y + dy, DirectX::XM_PIDIV2 - 0.01f));
+
+				_cameraPos = DirectX::XMLoadFloat3(&spherical);
+
+				// Calculate camera position in world space
+				DirectX::XMVECTOR pos = DirectX::XMVectorSet(
+					spherical.z * std::cos(spherical.y) * std::cos(spherical.x),
+					spherical.z * std::sin(spherical.y),
+					spherical.z * std::cos(spherical.y) * std::sin(spherical.x),
+					1.0f
+				);
+
+				// Update view matrix
+				_view = DirectX::XMMatrixLookAtLH(
+					pos,  // Camera position in world space
+					DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f),  // Looking at origin
+					DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)   // Up vector
+				);
+
+				_lastPoint = currPoint;
+			}
+			return 0;
+		}
+		case WM_LBUTTONUP:
+		{
+			if (_isDragging) {
+				_isDragging = false;
+				ReleaseCapture();
+			}
+			return 0;
+		}
+		case WM_MOUSEWHEEL:
+		{
+			// GET_WHEEL_DELTA_WPARAM gives positive value (120) when scrolling up
+			// and negative value (-120) when scrolling down
+			int zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+
+			// Adjust radius (assuming it's stored in _cameraPos.z)
+			DirectX::XMFLOAT3 spherical;
+			DirectX::XMStoreFloat3(&spherical, _cameraPos);
+
+			// Scale the zoom speed as needed
+			float zoomSpeed = 0.01f;
+			spherical.z -= (zDelta * zoomSpeed);
+
+			// Optional: Clamp the radius to prevent getting too close or too far
+			spherical.z = std::max(1.0f, std::min(spherical.z, 100.0f));
+
+			_cameraPos = DirectX::XMLoadFloat3(&spherical);
+
+			// Calculate camera position in world space
+			DirectX::XMVECTOR pos = DirectX::XMVectorSet(
+				spherical.z * std::cos(spherical.y) * std::cos(spherical.x),
+				spherical.z * std::sin(spherical.y),
+				spherical.z * std::cos(spherical.y) * std::sin(spherical.x),
+				1.0f
+			);
+
+			// Update view matrix
+			_view = DirectX::XMMatrixLookAtLH(
+				pos,  // Camera position in world space
+				DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f),  // Looking at origin
+				DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)   // Up vector
+			);
 			return 0;
 		}
 		case WM_CLOSE:
@@ -152,7 +256,7 @@ void editor::paintEditor()
 		} col;
 	};
 
-	const vertex vertices[] =
+	constexpr vertex vertices[] =
 	{
 		{{-0.5f, -0.5f, -0.5f}, {255,   0,   0, 255}},
 		{{ 0.5f, -0.5f, -0.5f}, {  0, 255,   0, 255}},
@@ -165,7 +269,7 @@ void editor::paintEditor()
 		{{ 0.5f,  0.5f,  0.5f}, {0  , 127, 127, 255}},
 	};
 
-	const unsigned short indices[] =
+	constexpr unsigned short indices[] =
 	{
 		0,2,1, 2,3,1,
 		1,3,5, 3,7,5,
@@ -261,18 +365,6 @@ void editor::paintEditor()
 
 	// set primitive topology
 	_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	// bind view port
-	D3D11_VIEWPORT viewPort
-	{
-		.TopLeftX = 0,
-		.TopLeftY = 0,
-		.Width = static_cast<float>(_width),
-		.Height = static_cast<float>(_height),
-		.MinDepth = 0,
-		.MaxDepth = 1
-	};
-	_context->RSSetViewports(1, &viewPort);
 
 	// draw call
 	_context->DrawIndexed(std::size(indices), 0, 0);
