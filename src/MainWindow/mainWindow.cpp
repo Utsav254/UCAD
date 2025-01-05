@@ -3,9 +3,10 @@
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 
-mainWindow::mainWindow(const int width, const int height, LPCWSTR windowName, HINSTANCE hInst) :
+mainWindow::mainWindow(const int width, const int height, LPCWSTR windowName) :
     window(&wc),
-    tb(hInst, 0, 0, width, 200),
+    tb(0, 0, width, 200),
+    edt(0, 200, width, height - 200),
     _height(height), _width(width),
     _windowName(windowName),
     _hWnd(nullptr),
@@ -35,9 +36,14 @@ void mainWindow::createWindow(const bool showWindow)
 
     D3D_FEATURE_LEVEL featureLevel;
     const D3D_FEATURE_LEVEL featureLevelArray[2] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0 };
-    UINT createDeviceFlags = 0;
 
-    HRESULT res = D3D11CreateDevice(
+#ifdef _DEBUG
+    UINT createDeviceFlags = D3D11_CREATE_DEVICE_DEBUG;
+#else
+    UINT createDeviceFlags = 0;
+#endif
+
+    HRESULT hr = D3D11CreateDevice(
         nullptr,
         D3D_DRIVER_TYPE_HARDWARE,
         nullptr,
@@ -50,17 +56,25 @@ void mainWindow::createWindow(const bool showWindow)
         &_context
     );
 
-    if (res == DXGI_ERROR_UNSUPPORTED) {
-        res = D3D11CreateDevice(
+    if (hr == DXGI_ERROR_UNSUPPORTED) {
+        hr = D3D11CreateDevice(
             nullptr, D3D_DRIVER_TYPE_WARP, nullptr, createDeviceFlags,
             featureLevelArray, ARRAYSIZE(featureLevelArray), D3D11_SDK_VERSION,
             &_device, &featureLevel, &_context
         );
     }
-    if (res != S_OK) throw WINDOW_ERROR_HR(res);
+    if (hr != S_OK) throw WINDOW_ERROR_HR(hr);
 
-    tb.createWindow(true, _hWnd, _device.Get(), _context.Get());
+    try {
+        tb.createWindow(true, _hWnd, _device.Get(), _context.Get());
+        edt.createWindow(true, _hWnd, _device.Get(), _context.Get());
+    }
+    catch (const error& e) {
+        e.display();
+    }
+
     if (showWindow) ShowWindow(_hWnd, SW_SHOWNORMAL);
+    UpdateWindow(_hWnd);
 }
 
 LRESULT mainWindow::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -69,8 +83,16 @@ LRESULT mainWindow::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
     {
         case WM_SIZE:
         {
-            SetWindowPos(tb.gethWnd(), HWND_TOP, 0, 0, LOWORD(lParam), 200, SWP_NOZORDER | SWP_NOMOVE);
+            if (wParam == SIZE_MINIMIZED) return 0;
+            SetWindowPos(tb.getWindowHandle(), HWND_TOP, 0, 0, LOWORD(lParam), 200, SWP_NOZORDER | SWP_NOMOVE);
+            SetWindowPos(edt.getWindowHandle(), HWND_TOP, 0, 200, LOWORD(lParam), HIWORD(lParam) - 200, SWP_NOZORDER | SWP_NOMOVE);
             break;
+        }
+        case WM_USER+1:
+        {
+            int i = 0;
+            PostMessageW(edt.getWindowHandle(), WM_USER + 1, wParam, lParam);
+            return 0;
         }
         case WM_CLOSE:
         {

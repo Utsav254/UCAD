@@ -1,12 +1,13 @@
 #include "Ribbon/toolbar.hpp"
 
-toolBar::toolBar(HINSTANCE hInst, int x, int y, int width, int height) :
+toolBar::toolBar(int x, int y, int width, int height) :
 	window(&wc),
 	_x(x), _y(y),
 	_width(width), _height(height),
 	_hWnd(nullptr), _hWndParent(nullptr),
 	_device(nullptr), _context(nullptr), _swap(nullptr),  _renderTargetView(nullptr),
-	_dirty(true)
+	_dirty(true),
+	_color(0.0f, 0.0f, 0.0f, 0.0f)
 {}
 
 void toolBar::createWindow(const bool showWindow, HWND parent, ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context)
@@ -35,7 +36,7 @@ void toolBar::createWindow(const bool showWindow, HWND parent, ComPtr<ID3D11Devi
 
 	DXGI_SWAP_CHAIN_DESC sd;
 	ZeroMemory(&sd, sizeof(sd));
-	sd.BufferCount = 1;
+	sd.BufferCount = 2;
 	sd.BufferDesc.Width = 0;
 	sd.BufferDesc.Height = 0;
 	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -47,23 +48,19 @@ void toolBar::createWindow(const bool showWindow, HWND parent, ComPtr<ID3D11Devi
 	sd.SampleDesc.Count = 1;
 	sd.SampleDesc.Quality = 0;
 	sd.Windowed = TRUE;
-	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+	sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+
+	HRESULT hr = S_FALSE;
 
 	IDXGIFactory* factory = nullptr;
-	HRESULT res = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&factory);
-	if (FAILED(res)) {
-		throw WINDOW_ERROR_HR(res);
-	}
+	RUN_DX11(CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&factory));
 
-	res = factory->CreateSwapChain(_device.Get(), &sd, &_swap);
-	if (FAILED(res)) throw WINDOW_ERROR_HR(res);
+	RUN_DX11(factory->CreateSwapChain(_device.Get(), &sd, &_swap));
 
 	ID3D11Texture2D* pBackBuffer;
-	res = _swap->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
-	if (FAILED(res)) throw WINDOW_ERROR_HR(res);
+	RUN_DX11(_swap->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)));
 
-	res = _device->CreateRenderTargetView(pBackBuffer, nullptr, &_renderTargetView);
-	if (FAILED(res)) throw WINDOW_ERROR_HR(res);
+	RUN_DX11(_device->CreateRenderTargetView(pBackBuffer, nullptr, &_renderTargetView));
 
 	pBackBuffer->Release();
 	factory->Release();
@@ -90,14 +87,15 @@ LRESULT toolBar::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 			if (_device && _swap && _renderTargetView) {
 				_renderTargetView->Release();
 
-				_swap->ResizeBuffers(0, _width, _height, DXGI_FORMAT_UNKNOWN, 0);
+				RUN_DX11_NOTHROW(_swap->ResizeBuffers(0, _width, _height, DXGI_FORMAT_UNKNOWN, 0));
 
 				ID3D11Texture2D* pBackBuffer;
-				_swap->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
-				if(pBackBuffer != nullptr) _device->CreateRenderTargetView(pBackBuffer, nullptr, _renderTargetView.GetAddressOf());
+				RUN_DX11_NOTHROW(_swap->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)));
+				if (pBackBuffer != nullptr) {
+					RUN_DX11_NOTHROW(_device->CreateRenderTargetView(pBackBuffer, nullptr, _renderTargetView.GetAddressOf()));
+				}
 				pBackBuffer->Release();
 			}
-
 			_dirty = true;
 			return 0;
 		}
@@ -145,16 +143,15 @@ void toolBar::paintToolbar() {
 		ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollWithMouse |
 		ImGuiWindowFlags_AlwaysAutoResize);
 
-	ImGui::Text("what a nice ribbon innit?");
-
 	float fps = ImGui::GetIO().Framerate;
 
-	ImGui::Text("FPS: %.1f", fps);
-
-	ImGui::Button("Button tester1", { 100,100 });
+	ImGui::Text("Select Your Colour, FPS %f:", fps);
+	if (ImGui::ColorEdit3("Colour Picker##1", (float*)&_color, 0)) {
+		PostMessageW(_hWndParent, WM_USER + 1, (WPARAM)(&_color), 0);
+	}
 
 	ImGui::End();
-
+	
 	const float color[4] = { 0.0f , 0.0f, 0.0f, 1.0f };
 	_ui.endFrame(_context, _renderTargetView, color);
 

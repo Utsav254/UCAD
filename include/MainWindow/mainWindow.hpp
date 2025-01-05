@@ -1,6 +1,7 @@
 #pragma once
 #include "util/window.hpp"
 #include "Ribbon/toolbar.hpp"
+#include "Editor/editor.hpp"
 #include <d3d11.h>
 
 #include <wrl/client.h>
@@ -10,7 +11,7 @@ class mainWindow : public window {
 public:
     static constexpr LPCWSTR className = L"mainWindowClass";
 
-    mainWindow(const int width, const int height, LPCWSTR windowName, HINSTANCE hInst);
+    mainWindow(const int width, const int height, LPCWSTR windowName);
 
     ~mainWindow() = default;
 
@@ -20,6 +21,7 @@ public:
 
     void renderAll() {
         tb.paintToolbar();
+        edt.paintEditor();
     }
 
 public:
@@ -27,6 +29,7 @@ public:
 
 private:
     toolBar tb;
+    editor edt;
 
     int _height, _width;
     LPCWSTR _windowName;

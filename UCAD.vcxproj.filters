@@ -60,6 +60,9 @@
     <ClCompile Include="src\util\UI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Editor\editor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md">
@@ -118,5 +121,12 @@
     <ClInclude Include="include\util\UI.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Editor\editor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="shaders\VertexShader.hlsl" />
+    <FxCompile Include="shaders\PixelShader.hlsl" />
   </ItemGroup>
 </Project>

@@ -1,23 +1,24 @@
 #pragma once
 #include "util/window.hpp"
-#include "util/UI.hpp"
-
+#include <d3d11.h>
 #include <wrl/client.h>
+#include <DirectXMath.h>
 using Microsoft::WRL::ComPtr;
+namespace dx = DirectX;
 
-class toolBar : window
+class editor : public window
 {
 public:
-	static constexpr LPCWSTR className = L"toolBarClass";
+	static constexpr LPCWSTR className = L"editorClass";
 
-	toolBar(int x, int y, int width, int height);
-	~toolBar() = default;
+	editor(int x, int y, int width, int height);
+	~editor() = default;
 
 	void createWindow(const bool showWindow, HWND parent, ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context);
 
 	LRESULT handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
-	void paintToolbar();
+	void paintEditor();
 
 	inline const HWND getWindowHandle() const { return _hWnd; }
 
@@ -32,11 +33,10 @@ private:
 	ComPtr<IDXGISwapChain> _swap;
 	ComPtr<ID3D11RenderTargetView>_renderTargetView;
 
-	bool _dirty;
+	dx::XMMATRIX _model;
+	dx::XMMATRIX _view;
+	dx::XMMATRIX _projection;
 
-	ui _ui;
-
-	ImVec4 _color;
 private:
 	static inline WNDCLASSEX wc =
 	{
@@ -54,4 +54,3 @@ private:
 		.hIconSm = nullptr,
 	};
 };
-

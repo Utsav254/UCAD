@@ -3,6 +3,7 @@
 windowError::windowError(const int line, LPCWSTR fileName, LPCWSTR message, HRESULT hr) :
 	error(line, fileName, message), _hr(hr)
 {
+	_whatBuffer += L"\n";
 	LPWSTR errorMsg = nullptr;
 	FormatMessageW(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,

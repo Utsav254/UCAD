@@ -118,6 +118,7 @@
       <SubSystem>NotSet</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3d11.lib;DXGI.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -144,6 +145,7 @@
     <ClCompile Include="deps\ImGui\imgui_impl_win32.cpp" />
     <ClCompile Include="deps\ImGui\imgui_tables.cpp" />
     <ClCompile Include="deps\ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="src\Editor\editor.cpp" />
     <ClCompile Include="src\MainWindow\mainWindow.cpp" />
     <ClCompile Include="src\Ribbon\toolbar.cpp" />
     <ClCompile Include="src\util\UI.cpp" />
@@ -166,6 +168,7 @@
     <ClInclude Include="deps\ImGui\imstb_rectpack.h" />
     <ClInclude Include="deps\ImGui\imstb_textedit.h" />
     <ClInclude Include="deps\ImGui\imstb_truetype.h" />
+    <ClInclude Include="include\Editor\editor.hpp" />
     <ClInclude Include="include\MainWindow\mainWindow.hpp" />
     <ClInclude Include="include\Ribbon\toolbar.hpp" />
     <ClInclude Include="include\util\error.hpp" />
@@ -173,6 +176,17 @@
     <ClInclude Include="include\util\win.h" />
     <ClInclude Include="include\util\window.hpp" />
     <ClInclude Include="include\util\windowError.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="shaders\PixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="shaders\VertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
