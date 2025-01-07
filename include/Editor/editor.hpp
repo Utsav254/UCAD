@@ -32,6 +32,7 @@ private:
 	ComPtr<ID3D11DeviceContext> _context;
 	ComPtr<IDXGISwapChain> _swap;
 	ComPtr<ID3D11RenderTargetView>_renderTargetView;
+	ComPtr<ID3D11DepthStencilView> _depthStencilView;
 
 	dx::XMVECTOR _cameraPos;
 

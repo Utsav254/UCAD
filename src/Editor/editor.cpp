@@ -78,6 +78,33 @@ void editor::createWindow(const bool showWindow, HWND parent, ComPtr<ID3D11Devic
 	pBackBuffer->Release();
 	factory->Release();
 
+	D3D11_DEPTH_STENCIL_DESC dsDesc = { 0 };
+	dsDesc.DepthEnable = true;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	ComPtr<ID3D11DepthStencilState> dsState;
+	RUN_DX11(_device->CreateDepthStencilState(&dsDesc, &dsState));
+	_context->OMSetDepthStencilState(dsState.Get(), 1);
+
+	ComPtr<ID3D11Texture2D> depthStencil;
+	D3D11_TEXTURE2D_DESC dsTexDesc = { 0 };
+	dsTexDesc.Width = _width;
+	dsTexDesc.Height = _height;
+	dsTexDesc.MipLevels = 1;
+	dsTexDesc.ArraySize = 1;
+	dsTexDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	dsTexDesc.SampleDesc.Count = 1;
+	dsTexDesc.SampleDesc.Quality = 0;
+	dsTexDesc.Usage = D3D11_USAGE_DEFAULT;
+	dsTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	RUN_DX11(_device->CreateTexture2D(&dsTexDesc, nullptr, &depthStencil));
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC dsViewDesc = {};
+	dsViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	dsViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	dsViewDesc.Texture2D.MipSlice = 0;
+	RUN_DX11(_device->CreateDepthStencilView(depthStencil.Get(), &dsViewDesc, &_depthStencilView));
+
 	if (showWindow) ShowWindow(_hWnd, SW_SHOWDEFAULT);
 	UpdateWindow(_hWnd);
 }
@@ -95,16 +122,50 @@ LRESULT editor::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			if (_width == 0 || _height == 0) return 0;
 
 			if (_device && _swap && _renderTargetView) {
-				_renderTargetView->Release();
+				// Release both render target and depth stencil views
+				_renderTargetView.Reset();
+				_depthStencilView.Reset();
 
 				RUN_DX11_NOTHROW(_swap->ResizeBuffers(0, _width, _height, DXGI_FORMAT_UNKNOWN, 0));
 
+				// Recreate render target view
 				ID3D11Texture2D* pBackBuffer;
 				RUN_DX11_NOTHROW(_swap->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)));
 				if (pBackBuffer != nullptr) {
 					RUN_DX11_NOTHROW(_device->CreateRenderTargetView(pBackBuffer, nullptr, _renderTargetView.GetAddressOf()));
+					pBackBuffer->Release();
 				}
-				pBackBuffer->Release();
+
+				// Recreate depth stencil texture and view
+				ComPtr<ID3D11Texture2D> depthStencil;
+				D3D11_TEXTURE2D_DESC dsTexDesc = { 0 };
+				dsTexDesc.Width = _width;
+				dsTexDesc.Height = _height;
+				dsTexDesc.MipLevels = 1;
+				dsTexDesc.ArraySize = 1;
+				dsTexDesc.Format = DXGI_FORMAT_D32_FLOAT;
+				dsTexDesc.SampleDesc.Count = 1;
+				dsTexDesc.SampleDesc.Quality = 0;
+				dsTexDesc.Usage = D3D11_USAGE_DEFAULT;
+				dsTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+				RUN_DX11_NOTHROW(_device->CreateTexture2D(&dsTexDesc, nullptr, &depthStencil));
+
+				D3D11_DEPTH_STENCIL_VIEW_DESC dsViewDesc = {};
+				dsViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
+				dsViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+				dsViewDesc.Texture2D.MipSlice = 0;
+				RUN_DX11_NOTHROW(_device->CreateDepthStencilView(depthStencil.Get(), &dsViewDesc, _depthStencilView.GetAddressOf()));
+
+				// Reset viewport with new dimensions
+				D3D11_VIEWPORT viewPort{
+					.TopLeftX = 0,
+					.TopLeftY = 0,
+					.Width = static_cast<float>(_width),
+					.Height = static_cast<float>(_height),
+					.MinDepth = 0,
+					.MaxDepth = 1
+				};
+				_context->RSSetViewports(1, &viewPort);
 			}
 
 			_projection = dx::XMMatrixPerspectiveFovLH(
@@ -113,17 +174,6 @@ LRESULT editor::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				0.1f,
 				100.0f
 			);
-
-			D3D11_VIEWPORT viewPort
-			{
-				.TopLeftX = 0,
-				.TopLeftY = 0,
-				.Width = static_cast<float>(_width),
-				.Height = static_cast<float>(_height),
-				.MinDepth = 0,
-				.MaxDepth = 1
-			};
-			_context->RSSetViewports(1, &viewPort);
 
 			return 0;
 		}
@@ -186,24 +236,15 @@ LRESULT editor::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		case WM_MOUSEWHEEL:
 		{
-			// GET_WHEEL_DELTA_WPARAM gives positive value (120) when scrolling up
-			// and negative value (-120) when scrolling down
 			int zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-
-			// Adjust radius (assuming it's stored in _cameraPos.z)
 			DirectX::XMFLOAT3 spherical;
 			DirectX::XMStoreFloat3(&spherical, _cameraPos);
-
-			// Scale the zoom speed as needed
 			float zoomSpeed = 0.01f;
 			spherical.z -= (zDelta * zoomSpeed);
-
-			// Optional: Clamp the radius to prevent getting too close or too far
 			spherical.z = std::max(1.0f, std::min(spherical.z, 100.0f));
 
 			_cameraPos = DirectX::XMLoadFloat3(&spherical);
 
-			// Calculate camera position in world space
 			DirectX::XMVECTOR pos = DirectX::XMVectorSet(
 				spherical.z * std::cos(spherical.y) * std::cos(spherical.x),
 				spherical.z * std::sin(spherical.y),
@@ -211,7 +252,6 @@ LRESULT editor::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				1.0f
 			);
 
-			// Update view matrix
 			_view = DirectX::XMMatrixLookAtLH(
 				pos,  // Camera position in world space
 				DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f),  // Looking at origin
@@ -235,9 +275,12 @@ LRESULT editor::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 void editor::paintEditor()
 {
+	_context->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
+
 	HRESULT hr = S_FALSE;
 	const float color[4] = { 0.1f, 0.1f ,0.1f ,1.0f };
 	_context->ClearRenderTargetView(_renderTargetView.Get(), color);
+	_context->ClearDepthStencilView(_depthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	// verticies definitions
 	struct vertex
@@ -359,9 +402,6 @@ void editor::paintEditor()
 		nullptr, &pixelShader
 	));
 	_context->PSSetShader(pixelShader.Get(), nullptr, 0); 
-
-	// bind render target
-	_context->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), nullptr);
 
 	// set primitive topology
 	_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
