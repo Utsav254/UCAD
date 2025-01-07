@@ -3,7 +3,7 @@
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 
-mainWindow::mainWindow(const int width, const int height, LPCWSTR windowName) :
+mainWindow::mainWindow(const int width, const int height, const LPCWSTR windowName) :
     window(&wc),
     tb(0, 0, width, 200),
     edt(0, 200, width, height - 200),
@@ -13,12 +13,16 @@ mainWindow::mainWindow(const int width, const int height, LPCWSTR windowName) :
     _device(nullptr), _context(nullptr)
 {}
 
-void mainWindow::createWindow(const bool showWindow)
+void mainWindow::createWindow(const bool showWindow, HWND parent, ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context)
 {
 #ifdef _DEBUG
     static unsigned int numCalls = 0;
     numCalls++;
-    if (numCalls > 1) __debugbreak();
+    if (numCalls > 1) throw ERROR_FMT_M("Main Window error ... attempting to call createWindow twice on same instance");
+
+    if (parent != nullptr) throw ERROR_FMT_M("Main window given non nullptr parent window handle");
+#else
+    (void)parent;
 #endif // _DEBUG
 
     _hWnd = CreateWindowExW
@@ -31,43 +35,52 @@ void mainWindow::createWindow(const bool showWindow)
         nullptr, nullptr,
         _hInst, this
     );
-
     if (!_hWnd) throw WINDOW_ERROR;
+
 
     D3D_FEATURE_LEVEL featureLevel;
     const D3D_FEATURE_LEVEL featureLevelArray[2] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0 };
-
 #ifdef _DEBUG
     UINT createDeviceFlags = D3D11_CREATE_DEVICE_DEBUG;
 #else
     UINT createDeviceFlags = 0;
 #endif
 
-    HRESULT hr = D3D11CreateDevice(
-        nullptr,
-        D3D_DRIVER_TYPE_HARDWARE,
-        nullptr,
-        createDeviceFlags,
-        featureLevelArray,
-        ARRAYSIZE(featureLevelArray),
-        D3D11_SDK_VERSION,
-        &_device,
-        &featureLevel,
-        &_context
-    );
-
-    if (hr == DXGI_ERROR_UNSUPPORTED) {
-        hr = D3D11CreateDevice(
-            nullptr, D3D_DRIVER_TYPE_WARP, nullptr, createDeviceFlags,
-            featureLevelArray, ARRAYSIZE(featureLevelArray), D3D11_SDK_VERSION,
-            &_device, &featureLevel, &_context
+    if (device == nullptr && context == nullptr) {
+        HRESULT hr = D3D11CreateDevice(
+            nullptr,
+            D3D_DRIVER_TYPE_HARDWARE,
+            nullptr,
+            createDeviceFlags,
+            featureLevelArray,
+            ARRAYSIZE(featureLevelArray),
+            D3D11_SDK_VERSION,
+            &_device,
+            &featureLevel,
+            &_context
         );
+        if (hr == DXGI_ERROR_UNSUPPORTED) {
+            hr = D3D11CreateDevice(
+                nullptr, D3D_DRIVER_TYPE_WARP, nullptr, createDeviceFlags,
+                featureLevelArray, ARRAYSIZE(featureLevelArray), D3D11_SDK_VERSION,
+                &_device, &featureLevel, &_context
+            );
+        }
+        if (hr != S_OK) throw WINDOW_ERROR_HR(hr);
     }
-    if (hr != S_OK) throw WINDOW_ERROR_HR(hr);
+    else if (device == nullptr && context != nullptr) throw ERROR_FMT_M("Main window given null device bu non nullptr context");
+    else if (device != nullptr && context == nullptr) {
+        _device = device;
+        _device->GetImmediateContext(&_context);
+    }
+    else {
+        _device = device;
+        _context = context;
+    }
 
     try {
-        tb.createWindow(true, _hWnd, _device.Get(), _context.Get());
-        edt.createWindow(true, _hWnd, _device.Get(), _context.Get());
+        tb.createWindow(true, _hWnd, _device, _context);
+        edt.createWindow(true, _hWnd, _device, _context);
     }
     catch (const error& e) {
         e.display();

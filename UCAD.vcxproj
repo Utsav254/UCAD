@@ -148,6 +148,7 @@
     <ClCompile Include="src\Editor\editor.cpp" />
     <ClCompile Include="src\MainWindow\mainWindow.cpp" />
     <ClCompile Include="src\Ribbon\toolbar.cpp" />
+    <ClCompile Include="src\util\childWindow.cpp" />
     <ClCompile Include="src\util\UI.cpp" />
     <ClCompile Include="src\util\window.cpp" />
     <ClCompile Include="src\util\windowError.cpp" />
@@ -171,6 +172,7 @@
     <ClInclude Include="include\Editor\editor.hpp" />
     <ClInclude Include="include\MainWindow\mainWindow.hpp" />
     <ClInclude Include="include\Ribbon\toolbar.hpp" />
+    <ClInclude Include="include\util\childWindow.hpp" />
     <ClInclude Include="include\util\error.hpp" />
     <ClInclude Include="include\util\UI.hpp" />
     <ClInclude Include="include\util\win.h" />

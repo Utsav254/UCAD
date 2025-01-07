@@ -15,13 +15,14 @@ public:
 
     ~mainWindow() = default;
 
-    void createWindow(const bool showWindow);
+    void createWindow(const bool showWindow = true, HWND parent = nullptr,
+        ComPtr<ID3D11Device> device = nullptr, ComPtr<ID3D11DeviceContext> context = nullptr) override;
 
     LRESULT handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
-    void renderAll() {
-        tb.paintToolbar();
-        edt.paintEditor();
+    void paint() {
+        tb.paint();
+        edt.paint();
     }
 
 public:

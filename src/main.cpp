@@ -15,8 +15,7 @@ int WINAPI WinMain(
 		window::startUp(hInstance);
 
 		mainWindow wnd(1920, 1080, L"Main Window");
-		wnd.createWindow(true);
-
+		wnd.createWindow();
 
 		MSG windowMessage;
 		BOOL windowMessageResult;
@@ -25,7 +24,7 @@ int WINAPI WinMain(
 			DispatchMessageW(&windowMessage);
 
 			try {
-				wnd.renderAll();
+				wnd.paint();
 			}
 			catch (const error& e) {
 				e.display();

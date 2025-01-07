@@ -1,4 +1,4 @@
-cbuffer Transform
+cbuffer Transform : register(b0)
 {
     matrix mvp;
 };

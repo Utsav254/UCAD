@@ -2,11 +2,8 @@
 #include <d3dcompiler.h>
 
 editor::editor(int x, int y, int width, int height) :
-	window(&wc),
-	_x(x), _y(y),
-	_width(width), _height(height),
-	_hWnd(nullptr), _hWndParent(nullptr),
-	_device(nullptr), _context(nullptr), _swap(nullptr), _renderTargetView(nullptr),
+	childWindow(x, y, width, height),
+	_depthStencilView(nullptr),
 	_cameraPos(dx::XMVectorSet(2.0f, 2.0f, 2.0f, 1.0f)),
 	_model(dx::XMMatrixIdentity()),
 	_view(dx::XMMatrixLookAtLH(
@@ -23,61 +20,9 @@ editor::editor(int x, int y, int width, int height) :
 	_isDragging(false), _lastPoint({ 0, 0 })
 {}
 
-void editor::createWindow(const bool showWindow, HWND parent, ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context)
+void editor::createChildWindow()
 {
-	if (parent == nullptr) throw ERROR_FMT_M("editor was given nullptr parent handle");
-	_hWndParent = parent;
-
-	if (device == nullptr) throw ERROR_FMT_M("editor was given nullptr d3d11 device");
-	_device = device;
-
-	if (context == nullptr) throw ERROR_FMT_M("editor was give nullptr d3d11 context");
-	_context = context;
-
-	_hWnd = CreateWindowExW
-	(
-		0,
-		className,
-		L"ToolBar",
-		WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN,
-		_x, _y, _width, _height,
-		parent, nullptr,
-		_hInst, this
-	);
-
-	if (!_hWnd) throw WINDOW_ERROR;
-
-	DXGI_SWAP_CHAIN_DESC sd;
-	ZeroMemory(&sd, sizeof(sd));
-	sd.BufferCount = 2;
-	sd.BufferDesc.Width = 0;
-	sd.BufferDesc.Height = 0;
-	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	sd.BufferDesc.RefreshRate.Numerator = 0;
-	sd.BufferDesc.RefreshRate.Denominator = 0;
-	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	sd.OutputWindow = _hWnd;
-	sd.SampleDesc.Count = 1;
-	sd.SampleDesc.Quality = 0;
-	sd.Windowed = TRUE;
-	sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-
 	HRESULT hr = S_FALSE;
-
-	IDXGIFactory* factory = nullptr;
-	RUN_DX11(CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&factory));
-
-	RUN_DX11(factory->CreateSwapChain(_device.Get(), &sd, &_swap));
-
-	ID3D11Texture2D* pBackBuffer;
-	RUN_DX11(_swap->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)));
-
-	RUN_DX11(_device->CreateRenderTargetView(pBackBuffer, nullptr, &_renderTargetView));
-
-	pBackBuffer->Release();
-	factory->Release();
-
 	D3D11_DEPTH_STENCIL_DESC dsDesc = { 0 };
 	dsDesc.DepthEnable = true;
 	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
@@ -86,27 +31,8 @@ void editor::createWindow(const bool showWindow, HWND parent, ComPtr<ID3D11Devic
 	RUN_DX11(_device->CreateDepthStencilState(&dsDesc, &dsState));
 	_context->OMSetDepthStencilState(dsState.Get(), 1);
 
-	ComPtr<ID3D11Texture2D> depthStencil;
-	D3D11_TEXTURE2D_DESC dsTexDesc = { 0 };
-	dsTexDesc.Width = _width;
-	dsTexDesc.Height = _height;
-	dsTexDesc.MipLevels = 1;
-	dsTexDesc.ArraySize = 1;
-	dsTexDesc.Format = DXGI_FORMAT_D32_FLOAT;
-	dsTexDesc.SampleDesc.Count = 1;
-	dsTexDesc.SampleDesc.Quality = 0;
-	dsTexDesc.Usage = D3D11_USAGE_DEFAULT;
-	dsTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-	RUN_DX11(_device->CreateTexture2D(&dsTexDesc, nullptr, &depthStencil));
-
-	D3D11_DEPTH_STENCIL_VIEW_DESC dsViewDesc = {};
-	dsViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
-	dsViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	dsViewDesc.Texture2D.MipSlice = 0;
-	RUN_DX11(_device->CreateDepthStencilView(depthStencil.Get(), &dsViewDesc, &_depthStencilView));
-
-	if (showWindow) ShowWindow(_hWnd, SW_SHOWDEFAULT);
-	UpdateWindow(_hWnd);
+	setDepthStencilView(_width, _height);
+	setViewPort(_width, _height);
 }
 
 LRESULT editor::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -115,66 +41,15 @@ LRESULT editor::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		case WM_SIZE:
 		{
-			if (wParam == SIZE_MINIMIZED) return 0;
-			_width = (UINT)LOWORD(lParam);
-			_height = (UINT)HIWORD(lParam);
-
-			if (_width == 0 || _height == 0) return 0;
-
-			if (_device && _swap && _renderTargetView) {
-				// Release both render target and depth stencil views
-				_renderTargetView.Reset();
-				_depthStencilView.Reset();
-
-				RUN_DX11_NOTHROW(_swap->ResizeBuffers(0, _width, _height, DXGI_FORMAT_UNKNOWN, 0));
-
-				// Recreate render target view
-				ID3D11Texture2D* pBackBuffer;
-				RUN_DX11_NOTHROW(_swap->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)));
-				if (pBackBuffer != nullptr) {
-					RUN_DX11_NOTHROW(_device->CreateRenderTargetView(pBackBuffer, nullptr, _renderTargetView.GetAddressOf()));
-					pBackBuffer->Release();
-				}
-
-				// Recreate depth stencil texture and view
-				ComPtr<ID3D11Texture2D> depthStencil;
-				D3D11_TEXTURE2D_DESC dsTexDesc = { 0 };
-				dsTexDesc.Width = _width;
-				dsTexDesc.Height = _height;
-				dsTexDesc.MipLevels = 1;
-				dsTexDesc.ArraySize = 1;
-				dsTexDesc.Format = DXGI_FORMAT_D32_FLOAT;
-				dsTexDesc.SampleDesc.Count = 1;
-				dsTexDesc.SampleDesc.Quality = 0;
-				dsTexDesc.Usage = D3D11_USAGE_DEFAULT;
-				dsTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-				RUN_DX11_NOTHROW(_device->CreateTexture2D(&dsTexDesc, nullptr, &depthStencil));
-
-				D3D11_DEPTH_STENCIL_VIEW_DESC dsViewDesc = {};
-				dsViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
-				dsViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-				dsViewDesc.Texture2D.MipSlice = 0;
-				RUN_DX11_NOTHROW(_device->CreateDepthStencilView(depthStencil.Get(), &dsViewDesc, _depthStencilView.GetAddressOf()));
-
-				// Reset viewport with new dimensions
-				D3D11_VIEWPORT viewPort{
-					.TopLeftX = 0,
-					.TopLeftY = 0,
-					.Width = static_cast<float>(_width),
-					.Height = static_cast<float>(_height),
-					.MinDepth = 0,
-					.MaxDepth = 1
-				};
-				_context->RSSetViewports(1, &viewPort);
-			}
-
+			WM_SIZEHandler(wParam, lParam);
+			setDepthStencilView(_width, _height);
+			setViewPort(_width, _height);
 			_projection = dx::XMMatrixPerspectiveFovLH(
 				dx::XM_PIDIV4,
 				static_cast<float>(_width) / static_cast<float>(_height),
 				0.1f,
 				100.0f
 			);
-
 			return 0;
 		}
 		case WM_USER + 1:
@@ -273,7 +148,7 @@ LRESULT editor::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProcW(hWnd, msg, wParam, lParam);	
 }
 
-void editor::paintEditor()
+void editor::paint()
 {
 	_context->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
 
@@ -384,7 +259,7 @@ void editor::paintEditor()
 
 	// input layout object
 	ComPtr<ID3D11InputLayout> inputLayout;
-	const D3D11_INPUT_ELEMENT_DESC inElDesc[] =
+	constexpr D3D11_INPUT_ELEMENT_DESC inElDesc[] =
 	{
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -411,5 +286,46 @@ void editor::paintEditor()
 
 	// flip front back buffer
 	_swap->Present(1, 0);
+}
+
+void editor::setDepthStencilView(int width, int height)
+{
+	if (_device && _swap) {
+		_depthStencilView.Reset();
+
+		ComPtr<ID3D11Texture2D> depthStencil;
+		D3D11_TEXTURE2D_DESC dsTexDesc = { 0 };
+		dsTexDesc.Width = width;
+		dsTexDesc.Height = height;
+		dsTexDesc.MipLevels = 1;
+		dsTexDesc.ArraySize = 1;
+		dsTexDesc.Format = DXGI_FORMAT_D32_FLOAT;
+		dsTexDesc.SampleDesc.Count = 1;
+		dsTexDesc.SampleDesc.Quality = 0;
+		dsTexDesc.Usage = D3D11_USAGE_DEFAULT;
+		dsTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		RUN_DX11_NOTHROW(_device->CreateTexture2D(&dsTexDesc, nullptr, &depthStencil));
+
+		D3D11_DEPTH_STENCIL_VIEW_DESC dsViewDesc = {};
+		dsViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
+		dsViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		dsViewDesc.Texture2D.MipSlice = 0;
+		RUN_DX11_NOTHROW(_device->CreateDepthStencilView(depthStencil.Get(), &dsViewDesc, _depthStencilView.GetAddressOf()));
+	}
+}
+
+void editor::setViewPort(int width, int height)
+{
+	if (_context) {
+		D3D11_VIEWPORT viewPort{
+			.TopLeftX = 0,
+			.TopLeftY = 0,
+			.Width = static_cast<float>(width),
+			.Height = static_cast<float>(height),
+			.MinDepth = 0,
+			.MaxDepth = 1
+		};
+		_context->RSSetViewports(1, &viewPort);
+	}
 }
 

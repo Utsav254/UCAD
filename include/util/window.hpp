@@ -4,6 +4,9 @@
 #include <mutex>
 #include <unordered_map>
 #include <string>
+#include <d3d11.h>
+#include <wrl/client.h>
+using Microsoft::WRL::ComPtr;
 
 class window {
 public:
@@ -16,16 +19,19 @@ public:
 
 	virtual void destroyWindow() noexcept final;
 
+	virtual void createWindow(bool showWindow = true, HWND hWndParent = nullptr,
+		ComPtr<ID3D11Device> device = nullptr, ComPtr<ID3D11DeviceContext> context = nullptr) = 0;
+
+	virtual void paint() = 0;
+
 	virtual LRESULT handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) = 0;
 
 public:
 	const int getInstanceCount() const noexcept;
-
 	inline LPCWSTR getClassName() const { return _className; }
 
 protected:
 	static inline HINSTANCE _hInst = nullptr;
-
 	LPCWSTR _className;
 
 private:
