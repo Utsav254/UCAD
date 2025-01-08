@@ -153,7 +153,7 @@ void editor::paint()
 	_context->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
 
 	HRESULT hr = S_FALSE;
-	const float color[4] = { 0.1f, 0.1f ,0.1f ,1.0f };
+	constexpr float color[4] = { 0.1f, 0.1f ,0.1f ,1.0f };
 	_context->ClearRenderTargetView(_renderTargetView.Get(), color);
 	_context->ClearDepthStencilView(_depthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
