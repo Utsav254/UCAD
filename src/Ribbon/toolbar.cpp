@@ -56,7 +56,9 @@ LRESULT toolBar::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 }
 
 void toolBar::paint() {
+#ifdef _NDEBUG
 	if (_dirty == false) return;
+#endif
 
 	_ui.newFrame();
 
@@ -74,6 +76,7 @@ void toolBar::paint() {
 	if (ImGui::ColorEdit3("Colour Picker##1", (float*)&_color, 0)) {
 		PostMessageW(_hWndParent, WM_USER + 1, (WPARAM)(&_color), 0);
 	}
+	ImGui::Text("theta %f:", theta);
 
 	ImGui::End();
 	

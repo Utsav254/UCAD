@@ -1,5 +1,6 @@
 #pragma once
-#include "Editor/bindable.hpp"
+#include "Editor/BindableDrawable/bindable.hpp"
+#include "Editor/BindableDrawable/shaders.hpp"
 #include <type_traits>
 
 template<typename T>
@@ -10,14 +11,21 @@ public:
         ComPtr<ID3D11DeviceContext> context,
         const T* vertices,
         std::size_t count,
+        const shader<ID3D11VertexShader>& sh,
         D3D11_USAGE usage = D3D11_USAGE_DEFAULT,
         UINT cpuAccessFlags = 0,
         UINT miscFlags = 0
     ) : bindable(device, context), _elementCount(count)
     {
+        HRESULT hr = S_FALSE;
         if (!vertices || count == 0) {
             throw ERROR_FMT_M("Invalid Vertex Data content or size");
         }
+
+        ComPtr<ID3DBlob> blob = sh.getBlob();
+        UINT descSize = 0;
+        D3D11_INPUT_ELEMENT_DESC* desc = T::getDesc(&descSize);
+        RUN_DX11(_device->CreateInputLayout(desc, descSize, blob->GetBufferPointer(), blob->GetBufferSize(), &_inputLayout));
 
         const D3D11_BUFFER_DESC bufferDesc = {
             .ByteWidth = static_cast<UINT>(count * sizeof(T)),
@@ -36,6 +44,7 @@ public:
         const UINT stride = sizeof(T);
         const UINT offset = 0;
         _context->IASetVertexBuffers(0, 1, _vertexBuffer.GetAddressOf(), &stride, &offset);
+        _context->IASetInputLayout(_inputLayout.Get());
     }
 
     void unbind() override {
@@ -49,6 +58,7 @@ public:
 
 private:
     ComPtr<ID3D11Buffer> _vertexBuffer;
+    ComPtr<ID3D11InputLayout> _inputLayout;
     std::size_t _elementCount;
 };
 
@@ -70,6 +80,7 @@ public:
         UINT miscFlags = 0
     ) : bindable(device, context), _elementCount(count)
     {
+        HRESULT hr = S_FALSE;
         if (!indices || count == 0) {
             throw ERROR_FMT_M("Invalid Index Data Content or size");
         }
@@ -103,16 +114,11 @@ private:
     std::size_t _elementCount;
 };
 
-template<typename T, UINT shaderType>
+template<typename T, typename typeOfShader>
 class constantBuffer : public bindable
 {
 public:
     static constexpr UINT MAX_BUFFER_SLOTS = 14;
-
-    enum shaderTypeEnum {
-        VS = 0,
-        PS = 1
-    };
 
     constantBuffer(
         ComPtr<ID3D11Device> device,
@@ -128,6 +134,7 @@ public:
         _slot(slot),
         _elementCount(count)
     {
+        HRESULT hr = S_FALSE;
         if (!data || count == 0) {
             throw ERROR_FMT_M("Invalid Constant Data or size");
         }
@@ -151,40 +158,42 @@ public:
 
     void bind() override
     {
-        if constexpr (shaderType == VS) {
+        if constexpr (std::is_same_v<typeOfShader, ID3D11VertexShader>) {
             _context->VSSetConstantBuffers(_slot, 1, _constantBuffer.GetAddressOf());
         }
-        else if constexpr (shaderType == PS) {
+        else if constexpr (std::is_same_v<typeOfShader, ID3D11PixelShader>) {
             _context->PSSetConstantBuffers(_slot, 1, _constantBuffer.GetAddressOf());
         }
         else {
-            static_assert(true, "Unsupported shader type");
+            static_assert(false, "Unsupported shader type");
         }
     }
 
     void unbind() override
     {
         ID3D11Buffer* nullBuffer = nullptr;
-        if constexpr (shaderType == VS) {
+        if constexpr (std::is_same_v<typeOfShader, ID3D11VertexShader>) {
             _context->VSSetConstantBuffers(_slot, 1, &nullBuffer);
         }
-        else if constexpr (shaderType == PS) {
+        else if constexpr (std::is_same_v<typeOfShader, ID3D11PixelShader>) {
             _context->PSSetConstantBuffers(_slot, 1, &nullBuffer);
         }
     }
 
-    void update(const void* data, size_t size)
+    void update(const T* data, std::size_t count)
     {
+        HRESULT hr = S_FALSE;
 #ifdef _DEBUG
-        if (!data || size == 0 || size > _bufferSize) {
-            throw std::invalid_argument("Invalid update data or size");
+        if (!data || count == 0 || count > _elementCount) {
+            throw ERROR_FMT_M("Invalid update call on  constant buffer");
         }
 #endif
 
         D3D11_MAPPED_SUBRESOURCE mappedData;
         RUN_DX11(_context->Map(_constantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
-        memcpy(mappedData.pData, data, size);
+        memcpy(mappedData.pData, data, sizeof(T) * count);
         _context->Unmap(_constantBuffer.Get(), 0);
+        bind();
     }
 
 private:

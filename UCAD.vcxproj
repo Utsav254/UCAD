@@ -153,6 +153,7 @@
     <ClCompile Include="deps\ImGui\imgui_impl_win32.cpp" />
     <ClCompile Include="deps\ImGui\imgui_tables.cpp" />
     <ClCompile Include="deps\ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="src\Editor\camera.cpp" />
     <ClCompile Include="src\Editor\editor.cpp" />
     <ClCompile Include="src\MainWindow\mainWindow.cpp" />
     <ClCompile Include="src\Ribbon\toolbar.cpp" />
@@ -177,9 +178,12 @@
     <ClInclude Include="deps\ImGui\imstb_rectpack.h" />
     <ClInclude Include="deps\ImGui\imstb_textedit.h" />
     <ClInclude Include="deps\ImGui\imstb_truetype.h" />
-    <ClInclude Include="include\Editor\bindable.hpp" />
-    <ClInclude Include="include\Editor\buffers.hpp" />
+    <ClInclude Include="include\Editor\BindableDrawable\bindable.hpp" />
+    <ClInclude Include="include\Editor\BindableDrawable\buffers.hpp" />
+    <ClInclude Include="include\Editor\BindableDrawable\cube.hpp" />
+    <ClInclude Include="include\Editor\camera.hpp" />
     <ClInclude Include="include\Editor\editor.hpp" />
+    <ClInclude Include="include\Editor\BindableDrawable\shaders.hpp" />
     <ClInclude Include="include\MainWindow\mainWindow.hpp" />
     <ClInclude Include="include\Ribbon\toolbar.hpp" />
     <ClInclude Include="include\util\childWindow.hpp" />

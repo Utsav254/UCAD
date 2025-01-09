@@ -20,9 +20,13 @@ public:
 
 	inline const HWND getWindowHandle() const { return _hWnd; }
 
+	static void setTheta(float in) { theta = in; }
+
 private:
 	bool _dirty;
 	ui _ui;
 	ImVec4 _color;
+
+	static inline float theta = 0.0f;
 };
 

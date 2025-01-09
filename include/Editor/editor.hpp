@@ -1,5 +1,7 @@
 #pragma once
 #include "util/childWindow.hpp"
+#include "Editor/BindableDrawable/cube.hpp"
+#include "Editor/camera.hpp"
 #include <d3d11.h>
 #include <wrl/client.h>
 #include <DirectXMath.h>
@@ -24,13 +26,13 @@ public:
 private:
 	void setDepthStencilView(int width, int height);
 	void setViewPort(int widht, int height);
+
 private:
+	// inherits device context swap-chain render-target-view
 	ComPtr<ID3D11DepthStencilView> _depthStencilView;
 
-	dx::XMVECTOR _cameraPos;
-	dx::XMMATRIX _model;
-	dx::XMMATRIX _view;
-	dx::XMMATRIX _projection;
+	camera _cam;
+	std::unique_ptr<cube> _cube;
 
 	bool _isDragging;
 	POINT _lastPoint;
