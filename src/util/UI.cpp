@@ -2,6 +2,7 @@
 
 ui::ui():
 	_uiContext(ImGui::CreateContext()),
+	_dpi(96),
 	io(ImGui::GetIO())
 {
 	IMGUI_CHECKVERSION();
@@ -20,6 +21,15 @@ void ui::initialise(HWND hWnd, ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceC
 {
 	ImGui_ImplWin32_Init(hWnd);
 	ImGui_ImplDX11_Init(device.Get(), context.Get());
+
+	_dpi = GetDpiForWindow(hWnd);
+}
+
+void ui::updateDpi(UINT dpi)
+{
+	_dpi = dpi;
+	io.DisplayFramebufferScale = ImVec2(static_cast<float>(_dpi), static_cast<float>(_dpi));
+	io.FontGlobalScale = static_cast<float>(_dpi);
 }
 
 void ui::newFrame()

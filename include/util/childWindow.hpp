@@ -36,7 +36,7 @@ private:
 	static inline WNDCLASSEX wc =
 	{
 		.cbSize = sizeof(WNDCLASSEXW),
-		.style = CS_CLASSDC,
+		.style = CS_HREDRAW | CS_VREDRAW,
 		.lpfnWndProc = DefWindowProcW,
 		.cbClsExtra = 0,
 		.cbWndExtra = 0,

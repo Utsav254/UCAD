@@ -22,6 +22,13 @@ void editor::createChildWindow()
 	setDepthStencilView(_width, _height);
 	setViewPort(_width, _height);
 
+	_constantBuffer = std::make_unique<constantBuffer<dx::XMMATRIX, ID3D11VertexShader>>
+		(
+			_device,
+			_context,
+			_cam.getTransformationMat(),
+			1
+		);
 	_cube = std::make_unique<cube>(_device, _context);
 }
 
@@ -41,14 +48,6 @@ LRESULT editor::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			return 0;
 		}
-		case WM_LBUTTONDOWN:
-		{
-			SetCapture(hWnd);
-			_isDragging = true;
-			_lastPoint.x = LOWORD(lParam);
-			_lastPoint.y = HIWORD(lParam);
-			return 0;
-		}
 		case WM_MOUSEMOVE:
 		{
 			if (_isDragging) {
@@ -56,12 +55,35 @@ LRESULT editor::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				float dx = 0.004f * (currPoint.x - _lastPoint.x);
 				float dy = 0.004f * (currPoint.y - _lastPoint.y);
 				_cam.orbit(dy, -dx);
-				//_cam.pan(-dx, dy);
+				// _cam.pan(-dx, dy);
 				_lastPoint = currPoint;
 			}
 			return 0;
 		}
+		case WM_LBUTTONDOWN:
+		{
+			_isDragging = true;
+			_lastPoint = { LOWORD(lParam), HIWORD(lParam) };
+			SetCapture(hWnd);
+
+			TRACKMOUSEEVENT tme;
+			tme.cbSize = sizeof(TRACKMOUSEEVENT);
+			tme.dwFlags = TME_LEAVE;
+			tme.hwndTrack = hWnd;
+			tme.dwHoverTime = HOVER_DEFAULT;
+			TrackMouseEvent(&tme);
+
+			return 0;
+		}
 		case WM_LBUTTONUP:
+		{
+			if (_isDragging) {
+				_isDragging = false;
+				ReleaseCapture();
+			}
+			return 0;
+		}
+		case WM_MOUSELEAVE:
 		{
 			if (_isDragging) {
 				_isDragging = false;
@@ -92,25 +114,12 @@ LRESULT editor::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 void editor::paint()
 {
 	_context->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
-
-	HRESULT hr = S_FALSE;
 	constexpr float color[4] = { 0.1f, 0.1f ,0.1f ,1.0f };
 	_context->ClearRenderTargetView(_renderTargetView.Get(), color);
 	_context->ClearDepthStencilView(_depthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-	ComPtr<ID3D11Buffer> vsConstantBuffer;
-	constexpr D3D11_BUFFER_DESC vsConstBufferDesc =
-	{
-		.ByteWidth = sizeof(dx::XMMATRIX),
-		.Usage = D3D11_USAGE_DYNAMIC,
-		.BindFlags = D3D11_BIND_CONSTANT_BUFFER,
-		.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE,
-		.MiscFlags = 0,
-		.StructureByteStride = sizeof(dx::XMMATRIX)
-	};
-	const D3D11_SUBRESOURCE_DATA constBufSubResData = { .pSysMem = _cam.getTransformationMat() };
-	RUN_DX11(_device->CreateBuffer(&vsConstBufferDesc, &constBufSubResData, &vsConstantBuffer));
-	_context->VSSetConstantBuffers(0, 1, vsConstantBuffer.GetAddressOf());
+	_constantBuffer->update(_cam.getTransformationMat(), 1);
+	_constantBuffer->bind();
 
 	_cube->bindAll();
 	_cube->draw();

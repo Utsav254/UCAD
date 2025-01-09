@@ -1,7 +1,4 @@
 #include "MainWindow/mainWindow.hpp"
-#include "imgui.h"
-#include "imgui_impl_win32.h"
-#include "imgui_impl_dx11.h"
 
 mainWindow::mainWindow(const int width, const int height, const LPCWSTR windowName) :
     window(&wc),
@@ -94,6 +91,85 @@ LRESULT mainWindow::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 {
     switch (msg)
     {
+        case WM_CREATE:
+        {
+            RECT size_rect;
+            GetWindowRect(hWnd, &size_rect);
+            SetWindowPos(
+                hWnd, NULL,
+                size_rect.left, size_rect.top,
+                size_rect.right - size_rect.left, size_rect.bottom - size_rect.top,
+                SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE
+            );
+            break;
+        }
+        case WM_NCCALCSIZE: {
+            if (!wParam) break;
+            UINT dpi = GetDpiForWindow(hWnd);
+
+            int frame_x = GetSystemMetricsForDpi(SM_CXFRAME, dpi);
+            int frame_y = GetSystemMetricsForDpi(SM_CYFRAME, dpi);
+            int padding = GetSystemMetricsForDpi(SM_CXPADDEDBORDER, dpi);
+
+            NCCALCSIZE_PARAMS* params = (NCCALCSIZE_PARAMS*)lParam;
+            RECT* requested_client_rect = params->rgrc;
+
+            requested_client_rect->right -= frame_x + padding;
+            requested_client_rect->left += frame_x + padding;
+            requested_client_rect->bottom -= frame_y + padding;
+
+            WINDOWPLACEMENT placement = { 0 };
+            placement.length = sizeof(WINDOWPLACEMENT);
+            if (GetWindowPlacement(hWnd, &placement)) {
+                if (placement.showCmd == SW_SHOWMAXIMIZED) {
+                    requested_client_rect->top += padding;
+
+                }
+            }
+            return 0;
+        }
+        case WM_NCHITTEST:
+        {
+            if (LOWORD(wParam)) {
+                return HTCAPTION;
+            }
+            POINT ptMouse = { LOWORD(lParam), HIWORD(lParam) };
+            RECT rectWindow;
+            GetWindowRect(hWnd, &rectWindow);
+            int borderWidth = 8;
+            int titleBarHeight = 30;
+            int buttonWidth = 50;
+            int buttonHeight = titleBarHeight;
+            LONG windowWidth = rectWindow.right - rectWindow.left;
+            LONG windowHeight = rectWindow.bottom - rectWindow.top;
+
+            int mouseX = ptMouse.x - rectWindow.left;
+            int mouseY = ptMouse.y - rectWindow.top;
+
+            if (mouseX < borderWidth && mouseY < borderWidth)
+                return HTTOPLEFT;
+            if (mouseX > windowWidth - borderWidth && mouseY < borderWidth)
+                return HTTOPRIGHT;
+            if (mouseX < borderWidth && mouseY > windowHeight - borderWidth)
+                return HTBOTTOMLEFT;
+            if (mouseX > windowWidth - borderWidth && mouseY > windowHeight - borderWidth)
+                return HTBOTTOMRIGHT;
+
+            if (mouseY < borderWidth)
+                return HTTOP;
+            if (mouseY > windowHeight - borderWidth)
+                return HTBOTTOM;
+            if (mouseX < borderWidth)
+                return HTLEFT;
+            if (mouseX > windowWidth - borderWidth)
+                return HTRIGHT;
+
+            if (mouseY < 50) {
+                return HTCAPTION;
+            }
+
+            return HTCLIENT;
+        }
         case WM_SIZE:
         {
             if (wParam == SIZE_MINIMIZED) return 0;

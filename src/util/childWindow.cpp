@@ -25,12 +25,11 @@ void childWindow::createWindow(const bool showWindow, HWND parent,
 		0,
 		className,
 		L"ToolBar",
-		WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN,
+		WS_CHILD | WS_VISIBLE,
 		_x, _y, _width, _height,
 		parent, nullptr,
 		_hInst, this
 	);
-
 	if (!_hWnd) throw WINDOW_ERROR;
 
 	DXGI_SWAP_CHAIN_DESC sd;

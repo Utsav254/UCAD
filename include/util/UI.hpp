@@ -14,6 +14,7 @@ class ui
 {
 private:
 	ImGuiContext* _uiContext;
+	UINT _dpi;
 
 public:
 	ImGuiIO& io;
@@ -23,6 +24,7 @@ public:
 	~ui();
 
 	void initialise(HWND hWnd, ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context);
+	void updateDpi(UINT dpi);
 
 	void newFrame();
 

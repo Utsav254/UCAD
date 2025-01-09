@@ -16,9 +16,8 @@ public:
 	void updateAspectRatio(float newAspectRatio);
 
 	inline const dx::XMMATRIX* getTransformationMat() const noexcept { return &_mvp; }
-	inline const dx::XMMATRIX* getViewMatrix() const noexcept { return &_view; }
-private:
 
+private:
 	// cartesian system
 	dx::XMVECTOR _position;
 	dx::XMVECTOR _target;
@@ -35,5 +34,4 @@ private:
 	dx::XMMATRIX _projection;
 
 	dx::XMMATRIX _mvp;
-
 };

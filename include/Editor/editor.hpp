@@ -30,6 +30,7 @@ private:
 private:
 	// inherits device context swap-chain render-target-view
 	ComPtr<ID3D11DepthStencilView> _depthStencilView;
+	std::unique_ptr<constantBuffer<dx::XMMATRIX, ID3D11VertexShader>> _constantBuffer;
 
 	camera _cam;
 	std::unique_ptr<cube> _cube;
