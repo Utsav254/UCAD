@@ -1,19 +1,22 @@
-cbuffer Transform : register(b0)
+cbuffer MatrixBuffer : register(b0)
 {
-    matrix mvp;
-};
+    matrix modelViewProjection;
+}
 
-struct VSOut
-{    
-    float4 color : COLOR;
+struct VSOutput
+{
+    float3 worldPos : POSITION;
+    float3 normal : NORM;
     float4 pos : SV_Position;
 };
 
-VSOut main( float3 pos : POSITION, float4 Col : COLOR)
+VSOutput main(float3 pos: POSITION, float3 n: NORM)
 {
-    VSOut vso;
-    vso.pos = mul(float4(pos, 1.0f), mvp);
-    vso.color = Col;
+    VSOutput vso;
+    
+    vso.worldPos = pos;
+    vso.normal = n;
+    vso.pos = mul(float4(pos, 1.0f), modelViewProjection);
+    
     return vso;
 }
-

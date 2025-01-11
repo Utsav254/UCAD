@@ -2,6 +2,7 @@
 #include "util/childWindow.hpp"
 #include "Editor/BindableDrawable/cube.hpp"
 #include "Editor/camera.hpp"
+#include "Editor/model.hpp"
 #include <d3d11.h>
 #include <wrl/client.h>
 #include <DirectXMath.h>
@@ -30,10 +31,12 @@ private:
 private:
 	// inherits device context swap-chain render-target-view
 	ComPtr<ID3D11DepthStencilView> _depthStencilView;
-	std::unique_ptr<constantBuffer<dx::XMMATRIX, ID3D11VertexShader>> _constantBuffer;
+	std::unique_ptr<constantBuffer<dx::XMMATRIX, ID3D11VertexShader>> _constantBufferVert;
+	std::unique_ptr<constantBuffer<dx::XMVECTOR, ID3D11PixelShader>> _constantBufferPix;
 
 	camera _cam;
-	std::unique_ptr<cube> _cube;
+	//std::unique_ptr<cube> _cube;
+	std::unique_ptr<model> _model;
 
 	bool _isDragging;
 	POINT _lastPoint;

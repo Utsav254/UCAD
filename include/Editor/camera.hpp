@@ -16,6 +16,7 @@ public:
 	void updateAspectRatio(float newAspectRatio);
 
 	inline const dx::XMMATRIX* getTransformationMat() const noexcept { return &_mvp; }
+	inline const dx::XMVECTOR* getCameraPositionVec() const noexcept { return &_position; }
 
 private:
 	// cartesian system

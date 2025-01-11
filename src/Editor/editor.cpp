@@ -22,14 +22,23 @@ void editor::createChildWindow()
 	setDepthStencilView(_width, _height);
 	setViewPort(_width, _height);
 
-	_constantBuffer = std::make_unique<constantBuffer<dx::XMMATRIX, ID3D11VertexShader>>
+	_constantBufferVert = std::make_unique<constantBuffer<dx::XMMATRIX, ID3D11VertexShader>>
 		(
 			_device,
 			_context,
 			_cam.getTransformationMat(),
 			1
 		);
-	_cube = std::make_unique<cube>(_device, _context);
+
+	_constantBufferPix = std::make_unique<constantBuffer<dx::XMVECTOR, ID3D11PixelShader>>
+		(
+			_device,
+			_context,
+			_cam.getCameraPositionVec(),
+			1
+		);
+
+	_model = std::make_unique<model>(_device, _context);
 }
 
 LRESULT editor::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -118,11 +127,14 @@ void editor::paint()
 	_context->ClearRenderTargetView(_renderTargetView.Get(), color);
 	_context->ClearDepthStencilView(_depthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-	_constantBuffer->update(_cam.getTransformationMat(), 1);
-	_constantBuffer->bind();
+	_constantBufferVert->update(_cam.getTransformationMat(), 1);
+	_constantBufferVert->bind();
 
-	_cube->bindAll();
-	_cube->draw();
+	_constantBufferPix->update(_cam.getCameraPositionVec(), 1);
+	_constantBufferPix->bind();
+
+	_model->bindAll();
+	_model->draw();
 	_swap->Present(1, 0);
 }
 

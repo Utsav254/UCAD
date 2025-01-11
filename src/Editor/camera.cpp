@@ -9,7 +9,7 @@ camera::camera(float aspectRatio, float fov):
 	_aspectRatio(aspectRatio),
 	_fov(fov),
 	_nearPlane(0.1f),
-	_farPlane(100.0f),
+	_farPlane(1000.0f),
 	_model(dx::XMMatrixIdentity()),
 	_view(dx::XMMatrixLookAtLH(_position, _target, _up)),
 	_projection(dx::XMMatrixPerspectiveLH(_fov, _aspectRatio, _nearPlane, _farPlane)),

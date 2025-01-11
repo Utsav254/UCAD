@@ -11,7 +11,7 @@ public:
         ComPtr<ID3D11DeviceContext> context,
         const T* vertices,
         std::size_t count,
-        const shader<ID3D11VertexShader>& sh,
+        const shader<ID3D11VertexShader>* sh,
         D3D11_USAGE usage = D3D11_USAGE_DEFAULT,
         UINT cpuAccessFlags = 0,
         UINT miscFlags = 0
@@ -22,7 +22,7 @@ public:
             throw ERROR_FMT_M("Invalid Vertex Data content or size");
         }
 
-        ComPtr<ID3DBlob> blob = sh.getBlob();
+        ComPtr<ID3DBlob> blob = sh->getBlob();
         UINT descSize = 0;
         D3D11_INPUT_ELEMENT_DESC* desc = T::getDesc(&descSize);
         RUN_DX11(_device->CreateInputLayout(desc, descSize, blob->GetBufferPointer(), blob->GetBufferSize(), &_inputLayout));

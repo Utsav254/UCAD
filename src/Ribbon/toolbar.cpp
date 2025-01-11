@@ -1,4 +1,4 @@
-#include "Ribbon/toolbar.hpp"
+﻿#include "Ribbon/toolbar.hpp"
 
 toolBar::toolBar(int x, int y, int width, int height) :
 	childWindow(x, y, width, height),
@@ -66,21 +66,19 @@ void toolBar::paint() {
 #ifdef _NDEBUG
 	if (_dirty == false) return;
 #endif
-
 	_ui.newFrame();
 
-	ImGui::SetNextWindowPos(ImVec2(20, 20)); // Fixed position
-	ImGui::SetNextWindowSize(ImVec2(1000, 150)); // Fixed size
-	ImGui::Begin("Borderless Window", nullptr,
-		ImGuiWindowFlags_NoTitleBar |
-		ImGuiWindowFlags_NoResize |
-		ImGuiWindowFlags_NoMove |
-		ImGuiWindowFlags_NoCollapse);
-	ImGui::Text("Ribbon buttons area");
+	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(static_cast<float>(_width - 10), static_cast<float>(_height - 10)), ImGuiCond_Always);
+	ImGui::Begin("Ribbon", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground);
+
+	ImGui::Text("This is inside a transparent window!");
+	ImGui::Text("Place Holder for UI");
+	if (ImGui::Button("X", {50.0f ,50.0f})) PostMessageW(_hWndParent, WM_CLOSE, 0, 0);
+
 	ImGui::End();
 
 	const float color[4] = { 0.0f , 0.0f, 0.0f, 1.0f };
 	_ui.endFrame(_context, _renderTargetView, color);
-
 	_swap->Present(1, 0);
 }

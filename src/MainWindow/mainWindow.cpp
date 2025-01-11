@@ -130,16 +130,10 @@ LRESULT mainWindow::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
         }
         case WM_NCHITTEST:
         {
-            if (LOWORD(wParam)) {
-                return HTCAPTION;
-            }
             POINT ptMouse = { LOWORD(lParam), HIWORD(lParam) };
             RECT rectWindow;
             GetWindowRect(hWnd, &rectWindow);
-            int borderWidth = 8;
-            int titleBarHeight = 30;
-            int buttonWidth = 50;
-            int buttonHeight = titleBarHeight;
+            int borderWidth = 10;
             LONG windowWidth = rectWindow.right - rectWindow.left;
             LONG windowHeight = rectWindow.bottom - rectWindow.top;
 
