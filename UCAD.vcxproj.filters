@@ -18,55 +18,37 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\util\error.cpp">
+    <ClCompile Include="src\error.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\util\windowError.cpp">
+    <ClCompile Include="src\window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\util\window.cpp">
+    <ClCompile Include="src\camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Ribbon\toolbar.cpp">
+    <ClCompile Include="deps\DearImGui\imgui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\MainWindow\mainWindow.cpp">
+    <ClCompile Include="deps\DearImGui\imgui_demo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="deps\ImGui\imgui.cpp">
+    <ClCompile Include="deps\DearImGui\imgui_draw.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="deps\ImGui\imgui_demo.cpp">
+    <ClCompile Include="deps\DearImGui\imgui_tables.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="deps\ImGui\imgui_draw.cpp">
+    <ClCompile Include="deps\DearImGui\imgui_widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="deps\ImGui\imgui_impl_dx11.cpp">
+    <ClCompile Include="deps\DearImGui\backends\imgui_impl_dx11.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="deps\ImGui\imgui_impl_win32.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="deps\ImGui\imgui_tables.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="deps\ImGui\imgui_widgets.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\util\UI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Editor\editor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\util\childWindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Editor\camera.cpp">
+    <ClCompile Include="deps\DearImGui\backends\imgui_impl_win32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -80,72 +62,55 @@
     <None Include=".gitattributes">
       <Filter>Git</Filter>
     </None>
+    <None Include=".gitmodules" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\util\error.hpp">
+    <ClInclude Include="src\error.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\util\windowError.hpp">
+    <ClInclude Include="src\win.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\util\window.hpp">
+    <ClInclude Include="src\window.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\util\win.h">
+    <ClInclude Include="src\BindableDrawable\bindable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Ribbon\toolbar.hpp">
+    <ClInclude Include="src\BindableDrawable\buffers.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\MainWindow\mainWindow.hpp">
+    <ClInclude Include="src\BindableDrawable\shaders.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="deps\ImGui\imconfig.h">
+    <ClInclude Include="src\BindableDrawable\cube.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="deps\ImGui\imgui.h">
+    <ClInclude Include="src\camera.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="deps\ImGui\imgui_impl_dx11.h">
+    <ClInclude Include="deps\DearImGui\imconfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="deps\ImGui\imgui_impl_win32.h">
+    <ClInclude Include="deps\DearImGui\imgui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="deps\ImGui\imgui_internal.h">
+    <ClInclude Include="deps\DearImGui\imgui_internal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="deps\ImGui\imstb_rectpack.h">
+    <ClInclude Include="deps\DearImGui\imstb_rectpack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="deps\ImGui\imstb_textedit.h">
+    <ClInclude Include="deps\DearImGui\imstb_textedit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="deps\ImGui\imstb_truetype.h">
+    <ClInclude Include="deps\DearImGui\imstb_truetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\util\UI.hpp">
+    <ClInclude Include="deps\DearImGui\backends\imgui_impl_dx11.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Editor\editor.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Editor\BindableDrawable\bindable.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Editor\BindableDrawable\buffers.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\util\childWindow.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Editor\BindableDrawable\shaders.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Editor\BindableDrawable\cube.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Editor\camera.hpp">
+    <ClInclude Include="deps\DearImGui\backends\imgui_impl_win32.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

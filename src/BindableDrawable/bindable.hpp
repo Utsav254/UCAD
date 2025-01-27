@@ -1,5 +1,5 @@
 #pragma once
-#include "util/windowError.hpp"
+#include "error.hpp"
 #include <d3d11.h>
 #include <wrl/client.h>
 using Microsoft::WRL::ComPtr;

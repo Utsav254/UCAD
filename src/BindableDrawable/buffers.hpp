@@ -1,6 +1,6 @@
 #pragma once
-#include "Editor/BindableDrawable/bindable.hpp"
-#include "Editor/BindableDrawable/shaders.hpp"
+#include "BindableDrawable/bindable.hpp"
+#include "BindableDrawable/shaders.hpp"
 #include <type_traits>
 
 template<typename T>

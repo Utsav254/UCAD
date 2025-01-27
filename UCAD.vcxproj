@@ -113,7 +113,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\U15go\Documents\dev\UCAD\deps\ImGui;$(SolutionDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\DearImGui\;$(SolutionDir)deps\DearImgui\backends\;$(SolutionDir)src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -146,52 +146,41 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="deps\ImGui\imgui.cpp" />
-    <ClCompile Include="deps\ImGui\imgui_demo.cpp" />
-    <ClCompile Include="deps\ImGui\imgui_draw.cpp" />
-    <ClCompile Include="deps\ImGui\imgui_impl_dx11.cpp" />
-    <ClCompile Include="deps\ImGui\imgui_impl_win32.cpp" />
-    <ClCompile Include="deps\ImGui\imgui_tables.cpp" />
-    <ClCompile Include="deps\ImGui\imgui_widgets.cpp" />
-    <ClCompile Include="src\Editor\camera.cpp" />
-    <ClCompile Include="src\Editor\editor.cpp" />
-    <ClCompile Include="src\MainWindow\mainWindow.cpp" />
-    <ClCompile Include="src\Ribbon\toolbar.cpp" />
-    <ClCompile Include="src\util\childWindow.cpp" />
-    <ClCompile Include="src\util\UI.cpp" />
-    <ClCompile Include="src\util\window.cpp" />
-    <ClCompile Include="src\util\windowError.cpp" />
+    <ClCompile Include="deps\DearImGui\backends\imgui_impl_dx11.cpp" />
+    <ClCompile Include="deps\DearImGui\backends\imgui_impl_win32.cpp" />
+    <ClCompile Include="deps\DearImGui\imgui.cpp" />
+    <ClCompile Include="deps\DearImGui\imgui_demo.cpp" />
+    <ClCompile Include="deps\DearImGui\imgui_draw.cpp" />
+    <ClCompile Include="deps\DearImGui\imgui_tables.cpp" />
+    <ClCompile Include="deps\DearImGui\imgui_widgets.cpp" />
+    <ClCompile Include="src\camera.cpp" />
+    <ClCompile Include="src\window.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\util\error.cpp" />
+    <ClCompile Include="src\error.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitattributes" />
     <None Include=".gitignore" />
+    <None Include=".gitmodules" />
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="deps\ImGui\imconfig.h" />
-    <ClInclude Include="deps\ImGui\imgui.h" />
-    <ClInclude Include="deps\ImGui\imgui_impl_dx11.h" />
-    <ClInclude Include="deps\ImGui\imgui_impl_win32.h" />
-    <ClInclude Include="deps\ImGui\imgui_internal.h" />
-    <ClInclude Include="deps\ImGui\imstb_rectpack.h" />
-    <ClInclude Include="deps\ImGui\imstb_textedit.h" />
-    <ClInclude Include="deps\ImGui\imstb_truetype.h" />
-    <ClInclude Include="include\Editor\BindableDrawable\bindable.hpp" />
-    <ClInclude Include="include\Editor\BindableDrawable\buffers.hpp" />
-    <ClInclude Include="include\Editor\BindableDrawable\cube.hpp" />
-    <ClInclude Include="include\Editor\camera.hpp" />
-    <ClInclude Include="include\Editor\editor.hpp" />
-    <ClInclude Include="include\Editor\BindableDrawable\shaders.hpp" />
-    <ClInclude Include="include\MainWindow\mainWindow.hpp" />
-    <ClInclude Include="include\Ribbon\toolbar.hpp" />
-    <ClInclude Include="include\util\childWindow.hpp" />
-    <ClInclude Include="include\util\error.hpp" />
-    <ClInclude Include="include\util\UI.hpp" />
-    <ClInclude Include="include\util\win.h" />
-    <ClInclude Include="include\util\window.hpp" />
-    <ClInclude Include="include\util\windowError.hpp" />
+    <ClInclude Include="deps\DearImGui\backends\imgui_impl_dx11.h" />
+    <ClInclude Include="deps\DearImGui\backends\imgui_impl_win32.h" />
+    <ClInclude Include="deps\DearImGui\imconfig.h" />
+    <ClInclude Include="deps\DearImGui\imgui.h" />
+    <ClInclude Include="deps\DearImGui\imgui_internal.h" />
+    <ClInclude Include="deps\DearImGui\imstb_rectpack.h" />
+    <ClInclude Include="deps\DearImGui\imstb_textedit.h" />
+    <ClInclude Include="deps\DearImGui\imstb_truetype.h" />
+    <ClInclude Include="src\BindableDrawable\bindable.hpp" />
+    <ClInclude Include="src\BindableDrawable\buffers.hpp" />
+    <ClInclude Include="src\BindableDrawable\cube.hpp" />
+    <ClInclude Include="src\camera.hpp" />
+    <ClInclude Include="src\BindableDrawable\shaders.hpp" />
+    <ClInclude Include="src\window.hpp" />
+    <ClInclude Include="src\error.hpp" />
+    <ClInclude Include="src\win.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\PixelShader.hlsl">

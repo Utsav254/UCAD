@@ -1,6 +1,5 @@
-﻿#include "Editor/camera.hpp"
+﻿#include "camera.hpp"
 #include <algorithm>
-#include "Ribbon/toolbar.hpp"
 
 camera::camera(float aspectRatio, float fov):
 	_position(dx::XMVectorSet(2.0f, 2.0f, 2.0f, 1.0f)),
@@ -24,7 +23,7 @@ void camera::orbit(float dTheta, float dPhi) noexcept
     const float z = dx::XMVectorGetZ(offset);
     const float r = dx::XMVectorGetX(dx::XMVector3LengthEst(offset));
     const float xzSquaredSum = (x * x) + (z * z);
-    const float xzLength = sqrt(xzSquaredSum);
+    const float xzLength = static_cast<float>(sqrt(static_cast<double>(xzSquaredSum)));
 
     dx::XMVECTOR angles;
     if (fabs(x) > 0.01f) {

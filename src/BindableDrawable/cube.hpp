@@ -1,5 +1,5 @@
 #pragma once
-#include "Editor/BindableDrawable/buffers.hpp"
+#include "BindableDrawable/buffers.hpp"
 #include <array>
 #include <DirectXMath.h>
 namespace dx = DirectX;

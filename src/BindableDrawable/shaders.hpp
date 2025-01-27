@@ -1,5 +1,5 @@
 #pragma once
-#include "Editor/BindableDrawable/bindable.hpp"
+#include "BindableDrawable/bindable.hpp"
 #include <type_traits>
 #include <d3dcompiler.h>
 

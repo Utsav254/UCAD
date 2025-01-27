@@ -1,21 +1,14 @@
-﻿#include "util/win.h"
-#include "MainWindow/mainWindow.hpp"
-#include "util/error.hpp"
+﻿#include "win.h"
+#include "window.hpp"
+#include "error.hpp"
 
-int WINAPI WinMain(
-	_In_ HINSTANCE hInstance,
-	_In_opt_ HINSTANCE hPrevInstance,
-	_In_ LPSTR lpCmdLine,
-	_In_ int nShowCmd
-) {
+int WINAPI WinMain(_In_ HINSTANCE hInst, _In_opt_ HINSTANCE hPrevInst, _In_ LPSTR cmdLine, _In_ int ShowCmd)
+{
 	try {
 		if (!SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2))
 			throw ERROR_FMT_M("Unable to set high dpi awareness");
 
-		window::startUp(hInstance);
-
-		mainWindow wnd(1920, 1080, L"Main Window");
-		wnd.createWindow();
+		window wnd;
 
 		MSG windowMessage;
 		BOOL windowMessageResult;
@@ -31,7 +24,6 @@ int WINAPI WinMain(
 			}
 		}
 
-		window::shutDown();
 		if (windowMessageResult == -1) return -1;
 		else return (int)windowMessage.wParam;
 	}
