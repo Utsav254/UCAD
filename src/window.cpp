@@ -140,10 +140,7 @@ LRESULT window::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			if (_isDragging) {
 				POINT currPoint = { LOWORD(lParam), HIWORD(lParam) };
-				float dx = 0.004f * (currPoint.x - _lastPoint.x);
-				float dy = 0.004f * (currPoint.y - _lastPoint.y);
-				_cam.orbit(dy, -dx);
-				// _cam.pan(-dx, dy);
+				_cam.mouseClickDrag(static_cast<float>(currPoint.x - _lastPoint.x), static_cast<float>(currPoint.y - _lastPoint.y));
 				_lastPoint = currPoint;
 			}
 			return 0;
@@ -217,7 +214,7 @@ void window::paint()
 	ImGui::NewFrame();
 
 	if (ImGui::Begin("Tools")){
-		ImGui::Text("Hello world adding tools window to mainwindow");
+		_cam.drawUI();
 		ImGui::End();
 	}
 

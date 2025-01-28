@@ -11,8 +11,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInst, _In_opt_ HINSTANCE hPrevInst, _In_ LPST
 		window wnd;
 
 		MSG windowMessage;
-		BOOL windowMessageResult;
-		while ((windowMessageResult = GetMessageW(&windowMessage, nullptr, 0, 0)) > 0) {
+		while ((GetMessageW(&windowMessage, nullptr, 0, 0)) > 0) {
 			TranslateMessage(&windowMessage);
 			DispatchMessageW(&windowMessage);
 
@@ -23,9 +22,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInst, _In_opt_ HINSTANCE hPrevInst, _In_ LPST
 				e.display();
 			}
 		}
-
-		if (windowMessageResult == -1) return -1;
-		else return (int)windowMessage.wParam;
+		return (int)windowMessage.wParam;
 	}
 	catch (const error& e) {
 		e.display();

@@ -5,8 +5,28 @@ namespace dx = DirectX;
 class camera
 {
 public:
+	enum projType
+	{
+		PERSPECTIVE,
+		ORTHOGRAPHIC,
+	};
+
+	enum toolType
+	{
+		NONE,
+		ORBIT,
+		PAN,
+		LOOKAROUND,
+		ZOOM,
+	};
+
+public:
 	camera(float aspectRatio, float fov = dx::XM_PIDIV4);
 	~camera() = default;
+
+	void drawUI() noexcept;
+
+	void mouseClickDrag(float dx, float dy) noexcept;
 
 	void orbit(float dTheta, float dPhi) noexcept;
 	void pan(float dx, float dy) noexcept;
@@ -14,7 +34,6 @@ public:
 	void forwardBackward(float d) noexcept;
 
 	void updateAspectRatio(float newAspectRatio);
-
 	inline const dx::XMMATRIX* getTransformationMat() const noexcept { return &_mvp; }
 
 private:
@@ -34,4 +53,8 @@ private:
 	dx::XMMATRIX _projection;
 
 	dx::XMMATRIX _mvp;
+
+	static inline constexpr const char* _toolNames[] = {"None", "Orbit", "Pan", "LookAround", "Zoom" };
+	toolType _tool;
+	projType _proj;
 };
