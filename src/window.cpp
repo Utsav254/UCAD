@@ -93,7 +93,7 @@ window::window() :
 			_cam.getTransformationMat(),
 			1
 		);
-	_cb = std::make_unique<cube>(_device, _context);
+	_cb = std::make_unique<CubeDemo>(_device, _context);
 
 	IMGUI_CHECKVERSION();
 	_io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
@@ -198,7 +198,7 @@ LRESULT window::handleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 void window::paint()
 {
-	constexpr float color[4] = { 0.1f, 0.1f ,0.1f ,1.0f };
+	constexpr float color[4] = { 0.7f, 0.7f ,0.7f ,1.0f };
 	_context->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
 	_context->ClearRenderTargetView(_renderTargetView.Get(), color);
 	_context->ClearDepthStencilView(_depthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
@@ -206,8 +206,8 @@ void window::paint()
 	_constantBuffer->update(_cam.getTransformationMat(), 1);
 	_constantBuffer->bind();
 
-	_cb->bindAll();
-	_cb->draw();
+	//_cb->bindAll();
+	_cb->render();
 
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
@@ -215,8 +215,9 @@ void window::paint()
 
 	if (ImGui::Begin("Tools")){
 		_cam.drawUI();
-		ImGui::End();
+		ImGui::Text("%.1f", _io.Framerate);
 	}
+	ImGui::End();
 
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

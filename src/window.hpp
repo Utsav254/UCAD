@@ -1,8 +1,9 @@
 #pragma once
 #include "error.hpp"
-#include "BindableDrawable/cube.hpp"
-#include "BindableDrawable/buffers.hpp"
+#include "cube.hpp"
+#include "dxAbstraction/buffers.hpp"
 #include "camera.hpp"
+#include "cubeEntity.hpp"
 
 #include "imgui.h"
 #include "imgui_impl_win32.h"
@@ -46,7 +47,9 @@ private:
 
 	camera _cam;
 	std::unique_ptr<constantBuffer<dx::XMMATRIX, ID3D11VertexShader>> _constantBuffer;
-	std::unique_ptr<cube> _cb;
+	//std::unique_ptr<cube> _cb;
+
+	std::unique_ptr<CubeDemo> _cb;
 
 	bool _isDragging;
 	POINT _lastPoint;

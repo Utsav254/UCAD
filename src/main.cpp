@@ -10,18 +10,28 @@ int WINAPI WinMain(_In_ HINSTANCE hInst, _In_opt_ HINSTANCE hPrevInst, _In_ LPST
 
 		window wnd;
 
-		MSG windowMessage;
-		while ((GetMessageW(&windowMessage, nullptr, 0, 0)) > 0) {
-			TranslateMessage(&windowMessage);
-			DispatchMessageW(&windowMessage);
+        MSG windowMessage;
+        bool running = true;
 
-			try {
-				wnd.paint();
-			}
-			catch (const error& e) {
-				e.display();
-			}
-		}
+        while (running) {
+            if (PeekMessageW(&windowMessage, nullptr, 0, 0, PM_REMOVE)) {
+                if (windowMessage.message == WM_QUIT) {
+                    running = false; // Exit the loop if we receive a quit message
+                }
+                else {
+                    TranslateMessage(&windowMessage);
+                    DispatchMessageW(&windowMessage);
+                }
+            }
+            else {
+                try {
+                    wnd.paint();
+                }
+                catch (const error& e) {
+                    e.display();
+                }
+            }
+        }
 		return (int)windowMessage.wParam;
 	}
 	catch (const error& e) {

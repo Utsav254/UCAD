@@ -1,5 +1,5 @@
 #pragma once
-#include "BindableDrawable/buffers.hpp"
+#include "dxAbstraction/buffers.hpp"
 #include <array>
 #include <DirectXMath.h>
 namespace dx = DirectX;
@@ -32,14 +32,14 @@ public:
         _context(context),
         _vertices(
             {
-                vertex(-0.5f, -0.5f, -0.5f, 255,   0,   0, 255),
-                vertex( 0.5f, -0.5f, -0.5f,   0, 255,   0, 255),
-                vertex(-0.5f,  0.5f, -0.5f,   0,   0, 255, 255),
-                vertex( 0.5f,  0.5f, -0.5f,   0, 255, 255, 255),
-                vertex(-0.5f, -0.5f,  0.5f, 255,   0, 255, 255),
-                vertex( 0.5f, -0.5f,  0.5f, 255, 255,   0, 255),
-                vertex(-0.5f,  0.5f,  0.5f, 127, 127, 127, 255),
-                vertex( 0.5f,  0.5f,  0.5f,   0, 127, 127, 255),
+                vertex(-0.5f, -0.5f, -0.5f, 255, 255, 255, 255),
+                vertex( 0.5f, -0.5f, -0.5f, 255, 255, 255, 255),
+                vertex(-0.5f,  0.5f, -0.5f, 255, 255, 255, 255),
+                vertex( 0.5f,  0.5f, -0.5f, 255, 255, 255, 255),
+                vertex(-0.5f, -0.5f,  0.5f, 255,   0,   0, 255),
+                vertex( 0.5f, -0.5f,  0.5f, 255,   0,   0, 255),
+                vertex(-0.5f,  0.5f,  0.5f, 255,   0,   0, 255),
+                vertex( 0.5f,  0.5f,  0.5f, 255,   0,   0, 255),
             }),
             _indices(
             {

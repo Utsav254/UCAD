@@ -12,10 +12,10 @@ camera::camera(float aspectRatio, float fov):
 	_fov(fov),
 	_nearPlane(0.1f),
 	_farPlane(100.0f),
-	_model(dx::XMMatrixIdentity()),
+	_model(dx::XMMatrixRotationX(-dx::XM_PIDIV2)),
 	_view(dx::XMMatrixLookAtLH(_position, _target, _up)),
 	_projection(dx::XMMatrixPerspectiveLH(_fov, _aspectRatio, _nearPlane, _farPlane)),
-	_mvp(_mvp = dx::XMMatrixTranspose(_model * _view * _projection)),
+	_mvp(dx::XMMatrixTranspose(_model * _view * _projection)),
 	_tool(toolType::NONE),
 	_proj(projType::PERSPECTIVE)
 {}

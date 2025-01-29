@@ -51,6 +51,9 @@
     <ClCompile Include="deps\DearImGui\backends\imgui_impl_win32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md">
@@ -74,16 +77,16 @@
     <ClInclude Include="src\window.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\BindableDrawable\bindable.hpp">
+    <ClInclude Include="src\dxAbstraction\bindable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\BindableDrawable\buffers.hpp">
+    <ClInclude Include="src\dxAbstraction\buffers.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\BindableDrawable\shaders.hpp">
+    <ClInclude Include="src\dxAbstraction\shaders.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\BindableDrawable\cube.hpp">
+    <ClInclude Include="src\cube.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\camera.hpp">
@@ -113,9 +116,25 @@
     <ClInclude Include="deps\DearImGui\backends\imgui_impl_win32.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\mesh.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\entt\single_include\entt\entt.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\render.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cubeEntity.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\VertexShader.hlsl" />
     <FxCompile Include="shaders\PixelShader.hlsl" />
+    <FxCompile Include="shaders\facet_vs.hlsl" />
+    <FxCompile Include="shaders\facet_ps.hlsl" />
+    <FxCompile Include="shaders\edge_vs.hlsl" />
+    <FxCompile Include="shaders\edge_ps.hlsl" />
   </ItemGroup>
 </Project>

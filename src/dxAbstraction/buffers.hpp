@@ -1,6 +1,6 @@
 #pragma once
-#include "BindableDrawable/bindable.hpp"
-#include "BindableDrawable/shaders.hpp"
+#include "dxAbstraction/bindable.hpp"
+#include "dxAbstraction/shaders.hpp"
 #include <type_traits>
 
 template<typename T>
