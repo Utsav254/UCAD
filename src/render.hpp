@@ -1,15 +1,12 @@
 #pragma once
-#include "dxAbstraction/buffers.hpp"
-#include "dxAbstraction/shaders.hpp"
+#include "pch.hpp"
+
+#include "buffers.hpp"
+#include "shaders.hpp"
 #include "mesh.hpp"
 
-#include "entt/entt.hpp"
-
-#include <DirectXMath.h>
 #include <memory>
 #include <vector>
-
-namespace dx = DirectX;
 
 struct RenderVertex {
 	dx::XMFLOAT3 position;

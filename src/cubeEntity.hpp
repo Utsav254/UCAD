@@ -1,5 +1,5 @@
 #pragma once
-#include "render.hpp" // Your render system from previous example
+#include "render.hpp"
 
 class CubeDemo {
 public:

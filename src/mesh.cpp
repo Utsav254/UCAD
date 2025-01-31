@@ -1,3 +1,4 @@
+#include "pch.hpp"
 #include "mesh.hpp"
 
 posVertex::posVertex(dx::XMVECTOR pos):

@@ -1,7 +1,5 @@
-﻿#include "camera.hpp"
-
-#include "imgui.h"
-
+﻿#include "pch.hpp"
+#include "camera.hpp"
 #include <algorithm>
 
 camera::camera(float aspectRatio, float fov):

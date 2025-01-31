@@ -117,6 +117,8 @@
       <Optimization>Disabled</Optimization>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>NotSet</SubSystem>
@@ -153,11 +155,25 @@
     <ClCompile Include="deps\DearImGui\imgui_draw.cpp" />
     <ClCompile Include="deps\DearImGui\imgui_tables.cpp" />
     <ClCompile Include="deps\DearImGui\imgui_widgets.cpp" />
-    <ClCompile Include="src\camera.cpp" />
-    <ClCompile Include="src\mesh.cpp" />
-    <ClCompile Include="src\window.cpp" />
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\error.cpp" />
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.hpp</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="src\camera.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\mesh.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\window.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\error.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitattributes" />
@@ -175,50 +191,50 @@
     <ClInclude Include="deps\DearImGui\imstb_textedit.h" />
     <ClInclude Include="deps\DearImGui\imstb_truetype.h" />
     <ClInclude Include="deps\entt\single_include\entt\entt.hpp" />
+    <ClInclude Include="src\pch.hpp" />
     <ClInclude Include="src\cubeEntity.hpp" />
-    <ClInclude Include="src\dxAbstraction\bindable.hpp" />
-    <ClInclude Include="src\dxAbstraction\buffers.hpp" />
+    <ClInclude Include="src\bindable.hpp" />
+    <ClInclude Include="src\buffers.hpp" />
     <ClInclude Include="src\cube.hpp" />
     <ClInclude Include="src\camera.hpp" />
-    <ClInclude Include="src\dxAbstraction\shaders.hpp" />
+    <ClInclude Include="src\shaders.hpp" />
     <ClInclude Include="src\mesh.hpp" />
     <ClInclude Include="src\render.hpp" />
     <ClInclude Include="src\window.hpp" />
     <ClInclude Include="src\error.hpp" />
-    <ClInclude Include="src\win.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="shaders\edge_ps.hlsl">
+    <FxCompile Include="src\edge_ps.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="shaders\edge_vs.hlsl">
+    <FxCompile Include="src\edge_vs.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
-    <FxCompile Include="shaders\facet_ps.hlsl">
+    <FxCompile Include="src\facet_ps.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="shaders\facet_vs.hlsl">
+    <FxCompile Include="src\facet_vs.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
-    <FxCompile Include="shaders\PixelShader.hlsl">
+    <FxCompile Include="src\PixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="shaders\VertexShader.hlsl">
+    <FxCompile Include="src\VertexShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
     </FxCompile>
   </ItemGroup>

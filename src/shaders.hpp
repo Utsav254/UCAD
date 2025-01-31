@@ -1,7 +1,8 @@
 #pragma once
-#include "dxAbstraction/bindable.hpp"
+#include "pch.hpp"
+
+#include "bindable.hpp"
 #include <type_traits>
-#include <d3dcompiler.h>
 
 template<typename typeOfShader>
 class shader : public bindable

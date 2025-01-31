@@ -1,6 +1,5 @@
 #pragma once
-#include <DirectXMath.h>
-namespace dx = DirectX;
+#include "pch.hpp"
 
 class camera
 {

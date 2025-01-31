@@ -9,12 +9,14 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Git">
       <UniqueIdentifier>{589d1641-a52d-4802-a934-1860e3c57188}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{f3df6107-e55b-4612-9eb1-6a6d1a9a5012}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Vendor">
+      <UniqueIdentifier>{f42fe722-6385-45bc-90cf-54711476b9da}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -30,28 +32,31 @@
     <ClCompile Include="src\camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="deps\DearImGui\imgui.cpp">
+    <ClCompile Include="src\mesh.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\DearImGui\imgui.cpp">
+      <Filter>Vendor</Filter>
     </ClCompile>
     <ClCompile Include="deps\DearImGui\imgui_demo.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Vendor</Filter>
     </ClCompile>
     <ClCompile Include="deps\DearImGui\imgui_draw.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="deps\DearImGui\imgui_tables.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="deps\DearImGui\imgui_widgets.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Vendor</Filter>
     </ClCompile>
     <ClCompile Include="deps\DearImGui\backends\imgui_impl_dx11.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Vendor</Filter>
     </ClCompile>
     <ClCompile Include="deps\DearImGui\backends\imgui_impl_win32.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Vendor</Filter>
     </ClCompile>
-    <ClCompile Include="src\mesh.cpp">
+    <ClCompile Include="deps\DearImGui\imgui_tables.cpp">
+      <Filter>Vendor</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\DearImGui\imgui_widgets.cpp">
+      <Filter>Vendor</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,25 +70,24 @@
     <None Include=".gitattributes">
       <Filter>Git</Filter>
     </None>
-    <None Include=".gitmodules" />
+    <None Include=".gitmodules">
+      <Filter>Git</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\error.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\win.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\window.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\dxAbstraction\bindable.hpp">
+    <ClInclude Include="src\bindable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\dxAbstraction\buffers.hpp">
+    <ClInclude Include="src\buffers.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\dxAbstraction\shaders.hpp">
+    <ClInclude Include="src\shaders.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\cube.hpp">
@@ -92,34 +96,7 @@
     <ClInclude Include="src\camera.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="deps\DearImGui\imconfig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="deps\DearImGui\imgui.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="deps\DearImGui\imgui_internal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="deps\DearImGui\imstb_rectpack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="deps\DearImGui\imstb_textedit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="deps\DearImGui\imstb_truetype.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="deps\DearImGui\backends\imgui_impl_dx11.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="deps\DearImGui\backends\imgui_impl_win32.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\mesh.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="deps\entt\single_include\entt\entt.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\render.hpp">
@@ -128,13 +105,55 @@
     <ClInclude Include="src\cubeEntity.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="deps\DearImGui\imstb_truetype.h">
+      <Filter>Vendor</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\DearImGui\imconfig.h">
+      <Filter>Vendor</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\DearImGui\imgui.h">
+      <Filter>Vendor</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\DearImGui\backends\imgui_impl_dx11.h">
+      <Filter>Vendor</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\DearImGui\backends\imgui_impl_win32.h">
+      <Filter>Vendor</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\DearImGui\imgui_internal.h">
+      <Filter>Vendor</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\DearImGui\imstb_rectpack.h">
+      <Filter>Vendor</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\DearImGui\imstb_textedit.h">
+      <Filter>Vendor</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\entt\single_include\entt\entt.hpp">
+      <Filter>Vendor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pch.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="shaders\VertexShader.hlsl" />
-    <FxCompile Include="shaders\PixelShader.hlsl" />
-    <FxCompile Include="shaders\facet_vs.hlsl" />
-    <FxCompile Include="shaders\facet_ps.hlsl" />
-    <FxCompile Include="shaders\edge_vs.hlsl" />
-    <FxCompile Include="shaders\edge_ps.hlsl" />
+    <FxCompile Include="src\edge_ps.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\edge_vs.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\facet_ps.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\facet_vs.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\PixelShader.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\VertexShader.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

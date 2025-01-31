@@ -1,13 +1,10 @@
 #pragma once
-#include "entt/entt.hpp"
-#include "win.h"
-#include "dxAbstraction/buffers.hpp"
+#include "pch.hpp"
+
+#include "buffers.hpp"
 
 #include <vector>
 #include <string>
-#include <DirectXMath.h>
-
-namespace dx = DirectX;
 
 struct posVertex
 {

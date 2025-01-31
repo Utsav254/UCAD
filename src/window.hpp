@@ -1,18 +1,13 @@
 #pragma once
+#include "pch.hpp"
+
 #include "error.hpp"
 #include "cube.hpp"
-#include "dxAbstraction/buffers.hpp"
+#include "buffers.hpp"
 #include "camera.hpp"
 #include "cubeEntity.hpp"
 
-#include "imgui.h"
-#include "imgui_impl_win32.h"
-#include "imgui_impl_dx11.h"
-
 #include <memory>
-#include <d3d11.h>
-#include <wrl/client.h>
-using Microsoft::WRL::ComPtr;
 
 class window {
 public:
@@ -66,7 +61,7 @@ private:
 		.hInstance = nullptr,
 		.hIcon = nullptr,
 		.hCursor = LoadCursorW(nullptr, IDC_ARROW),
-		.hbrBackground = (HBRUSH)GetStockObject(DKGRAY_BRUSH),
+		.hbrBackground = nullptr,
 		.lpszMenuName = nullptr,
 		.lpszClassName = className,
 		.hIconSm = nullptr,

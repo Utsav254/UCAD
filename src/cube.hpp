@@ -1,8 +1,8 @@
 #pragma once
-#include "dxAbstraction/buffers.hpp"
+#include "pch.hpp"
+
+#include "buffers.hpp"
 #include <array>
-#include <DirectXMath.h>
-namespace dx = DirectX;
 
 struct vertex {
     float x, y, z;
